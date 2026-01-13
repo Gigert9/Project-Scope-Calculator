@@ -1,0 +1,120 @@
+:root {
+    --primary: #2563eb;
+    --bg: #f8fafc;
+    --card: #ffffff;
+    --text: #1e293b;
+    --border: #e2e8f0;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    display: flex;
+    justify-content: center;
+    padding: 2rem;
+}
+
+.container {
+    max-width: 600px;
+    width: 100%;
+}
+
+h1 {
+    text-align: center;
+    color: var(--primary);
+}
+
+.module {
+    background: var(--card);
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    border: 1px solid var(--border);
+}
+
+.module h2 {
+    font-size: 1.1rem;
+    margin-top: 0;
+    border-bottom: 2px solid var(--bg);
+    padding-bottom: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.feature {
+    display: block;
+    padding: 0.5rem 0;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.feature:hover {
+    background: #f1f5f9;
+}
+
+input[type="checkbox"] {
+    margin-right: 10px;
+    transform: scale(1.2);
+}
+
+.result-card {
+    background: var(--primary);
+    color: white;
+    padding: 2rem;
+    border-radius: 8px;
+    text-align: center;
+    margin-top: 2rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.classification {
+    font-size: 1rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    margin: 0.5rem 0;
+}
+
+.hours {
+    font-size: 2rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    margin: 0.5rem 0;
+}
+
+.button-group {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.print-btn, .reset-btn {
+    flex: 1;
+    padding: 12px;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    border: none;
+    transition: opacity 0.2s;
+}
+
+.print-btn {
+    background-color: #2563eb;
+    color: white;
+}
+
+.reset-btn {
+    background-color: #e2e8f0;
+    color: #475569;
+}
+
+.print-btn:hover, .reset-btn:hover {
+    opacity: 0.9;
+}
+
+@media print {
+    .button-group {
+        display: none !important;
+    }
+}

@@ -1,0 +1,49 @@
+## ATTENDEE REGISTRATION
+workflows = 1
+field_logic = 1
+product_logic = 1
+session_logic = 1
+complex_reporting = 1
+housing = 1
+table_seating = 1
+lookup_integration = 1
+
+## APP and CO 
+hybrid_virtual = 1
+multi_event = 1
+wayfinding = 1
+CEUs = 1
+sponsor_branding = 1
+leads = 1
+
+## ABSTRACT
+complex_workflows = 1
+multiple_review_rounds = 1
+multiple_proposal_calls = 1
+
+## EXHIBITOR REGISTRATION
+floor_plan = 1
+year_round = 1
+complex_sponsors = 1
+
+## APPOINTMENTS
+multi_scheduling = 1
+first_time_system = 1
+matchmaking = 1
+
+## KIOSK/BADGES
+personal_agenda = 1
+double_sided = 1
+logic_based_badges = 1
+multi_badge_types = 1
+customer_hardware = 1
+
+## CUSTOM
+new_dev = 1
+integrations = 1
+SSO = 1
+
+## PROJECT MANAGEMENT
+multiple_POCs = 1
+recurring_calls = 1
+more_than_8_events = 1
