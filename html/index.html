@@ -3,204 +3,213 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Project Classification Calculator</title>
+    <link rel="icon" href="/static/assets/logo.ico" type="image/x-icon" />
+    <title>PSC Hours Calculator</title>
     <link rel="stylesheet" href="/static/styles/style.css">
     <script defer src="/static/javascript/script.js"></script>
 </head>
 <body>
 
     <div class="container">
+        <div class="logo-wrapper">
+            <img src="/static/assets/bravura_logo.png" alt="Company Logo" class="site-logo">
+        </div>
         <h1>Project Scope Calculator</h1>
         <p>Select the features required for each module to determine the project classification.</p>
 
         <div id="calculator-form">
-            <section class="module">
-                <h2>Attendee Registration</h2>
-                <label class="feature">
-                    <input type="checkbox" id="bre_noscope">Not in Scope
-                </label>
-                <span id="bre-features">
-                    <label class="feature">
-                        <input type="checkbox" id="workflows">More than 3 workflows
-                    </label>
-                    <label class="feature">
-                        <input type="checkbox" id="field_logic">Complex logic for fields
-                    </label>
-                    <label class="feature">
-                        <input type="checkbox" id="product_logic">Product logic
-                    </label>
-                    <label class="feature">
-                        <input type="checkbox" id="session_logic">Session logic
-                    </label>
-                    <label class="feature">
-                        <input type="checkbox" id="complex_reporting">Custom or complex reporting needs
-                    </label>
-                    <label class="feature">
-                        <input type="checkbox" id="housing">Housing
-                    </label>
-                    <label class="feature">
-                        <input type="checkbox" id="table_seating">Table seating
-                    </label>
-                    <label class="feature">
-                        <input type="checkbox" id="lookup_integration">Lookup integration
-                    </label>
-                </span>
-            </section>
+            <div class="main-layout">
+                <div class="form-sections">
+                    <section class="module">
+                        <h2>Attendee Registration</h2>
+                        <label class="feature">
+                            <input type="checkbox" id="bre_noscope">Not in Scope
+                        </label>
+                        <span id="bre-features">
+                            <label class="feature">
+                                <input type="checkbox" id="workflows">More than 3 workflows
+                            </label>
+                            <label class="feature">
+                                <input type="checkbox" id="field_logic">Complex logic for fields
+                            </label>
+                            <label class="feature">
+                                <input type="checkbox" id="product_logic">Product logic
+                            </label>
+                            <label class="feature">
+                                <input type="checkbox" id="session_logic">Session logic
+                            </label>
+                            <label class="feature">
+                                <input type="checkbox" id="complex_reporting">Custom or complex reporting needs
+                            </label>
+                            <label class="feature">
+                                <input type="checkbox" id="housing">Housing
+                            </label>
+                            <label class="feature">
+                                <input type="checkbox" id="table_seating">Table seating
+                            </label>
+                            <label class="feature">
+                                <input type="checkbox" id="lookup_integration">Lookup integration
+                            </label>
+                        </span>
+                    </section>
 
-            <section class="module">
-                <h2>APP and CO</h2>
-                <label class="feature">
-                    <input type="checkbox" id="app_noscope">Not in Scope
-                </label>
-                <span id="app-features">
-                    <label class="feature">
-                        <input type="checkbox" id="hybrid_virtual">Hybrid or Virtual
-                    </label>
-                    <label class="feature">
-                        <input type="checkbox" id="multi_event">Multi-Event App
-                    </label>
-                    <label class="feature">
-                        <input type="checkbox" id="wayfinding">Wayfinding
-                    </label>
-                    <label class="feature">
-                        <input type="checkbox" id="CEUs">Complex CEs
-                    </label>
-                    <label class="feature">
-                        <input type="checkbox" id="sponsor_branding">Emphasis on branding or sponsorship
-                    </label>
-                    <label class="feature">
-                        <input type="checkbox" id="leads">Leads
-                    </label>
-                </span>
-            </section>
+                    <section class="module">
+                        <h2>APP and CO</h2>
+                        <label class="feature">
+                            <input type="checkbox" id="app_noscope">Not in Scope
+                        </label>
+                        <span id="app-features">
+                            <label class="feature">
+                                <input type="checkbox" id="hybrid_virtual">Hybrid or Virtual
+                            </label>
+                            <label class="feature">
+                                <input type="checkbox" id="multi_event">Multi-Event App
+                            </label>
+                            <label class="feature">
+                                <input type="checkbox" id="wayfinding">Wayfinding
+                            </label>
+                            <label class="feature">
+                                <input type="checkbox" id="CEUs">Complex CEs
+                            </label>
+                            <label class="feature">
+                                <input type="checkbox" id="sponsor_branding">Emphasis on branding or sponsorship
+                            </label>
+                            <label class="feature">
+                                <input type="checkbox" id="leads">Leads
+                            </label>
+                        </span>
+                    </section>
 
-            <section class="module">
-                <h2>Abstract</h2>
-                <label class="feature">
-                    <input type="checkbox" id="abs_noscope">Not in Scope
-                </label>
-                <span id="abs-features">
-                    <label class="feature">
-                        <input type="checkbox" id="complex_workflows">Complex workflows for submission
-                    </label>
-                    <label class="feature">
-                        <input type="checkbox" id="multiple_review_rounds">Multiple rounds of review
-                    </label>
-                    <label class="feature">
-                        <input type="checkbox" id="multiple_proposal_calls">Multiple calls for proposals
-                    </label>
-                </span>
-            </section>
+                    <section class="module">
+                        <h2>Abstract</h2>
+                        <label class="feature">
+                            <input type="checkbox" id="abs_noscope">Not in Scope
+                        </label>
+                        <span id="abs-features">
+                            <label class="feature">
+                                <input type="checkbox" id="complex_workflows">Complex workflows for submission
+                            </label>
+                            <label class="feature">
+                                <input type="checkbox" id="multiple_review_rounds">Multiple rounds of review
+                            </label>
+                            <label class="feature">
+                                <input type="checkbox" id="multiple_proposal_calls">Multiple calls for proposals
+                            </label>
+                        </span>
+                    </section>
 
-            <section class="module">
-                <h2>Exhibits</h2>
-                <label class="feature">
-                    <input type="checkbox" id="exh_noscope">Not in Scope
-                </label>
-                <span id="exh-features">
-                    <label class="feature">
-                        <input type="checkbox" id="floor_plan">Floor plans
-                    </label>
-                    <label class="feature">
-                        <input type="checkbox" id="year_round">Year-Round
-                    </label>
-                    <label class="feature">
-                        <input type="checkbox" id="complex_sponsors">Complex sponsorship options
-                    </label>
-                </span>
-            </section>
+                    <section class="module">
+                        <h2>Exhibits</h2>
+                        <label class="feature">
+                            <input type="checkbox" id="exh_noscope">Not in Scope
+                        </label>
+                        <span id="exh-features">
+                            <label class="feature">
+                                <input type="checkbox" id="floor_plan">Floor plans
+                            </label>
+                            <label class="feature">
+                                <input type="checkbox" id="year_round">Year-Round
+                            </label>
+                            <label class="feature">
+                                <input type="checkbox" id="complex_sponsors">Complex sponsorship options
+                            </label>
+                        </span>
+                    </section>
 
-            <section class="module">
-                <h2>Appointments</h2>
-                <label class="feature">
-                    <input type="checkbox" id="appointments_noscope">Not in Scope
-                </label>
-                <span id="appointment-features">
-                    <label class="feature">
-                        <input type="checkbox" id="multi_scheduling">Multiple types of scheduling
-                    </label>
-                    <label class="feature">
-                        <input type="checkbox" id="first_time_system">First time appointment system user
-                    </label>
-                    <label class="feature">
-                        <input type="checkbox" id="matchmaking">Matchmaking required
-                    </label>
-                </span>
-            </section>
+                    <section class="module">
+                        <h2>Appointments</h2>
+                        <label class="feature">
+                            <input type="checkbox" id="appointments_noscope">Not in Scope
+                        </label>
+                        <span id="appointment-features">
+                            <label class="feature">
+                                <input type="checkbox" id="multi_scheduling">Multiple types of scheduling
+                            </label>
+                            <label class="feature">
+                                <input type="checkbox" id="first_time_system">First time appointment system user
+                            </label>
+                            <label class="feature">
+                                <input type="checkbox" id="matchmaking">Matchmaking required
+                            </label>
+                        </span>
+                    </section>
 
-            <section class="module">
-                <h2>Kiosk / Badges</h2>
-                <label class="feature">
-                    <input type="checkbox" id="kiosk_noscope">Not in Scope
-                </label>
-                <span id="kiosk-features">
-                    <label class="feature">
-                        <input type="checkbox" id="personal_agenda">Personal Agenda
-                    </label>
-                    <label class="feature">
-                        <input type="checkbox" id="double_sided">Double sided
-                    </label>
-                    <label class="feature">
-                        <input type="checkbox" id="logic_based_badges">Logic based badges
-                    </label>
-                    <label class="feature">
-                        <input type="checkbox" id="multi_badge_types">Multiple types of badges by attendee type
-                    </label>
-                    <label class="feature">
-                        <input type="checkbox" id="customer_hardware">Customer using their own hardware
-                    </label>
-                </span>
-            </section>
+                    <section class="module">
+                        <h2>Kiosk / Badges</h2>
+                        <label class="feature">
+                            <input type="checkbox" id="kiosk_noscope">Not in Scope
+                        </label>
+                        <span id="kiosk-features">
+                            <label class="feature">
+                                <input type="checkbox" id="personal_agenda">Personal Agenda
+                            </label>
+                            <label class="feature">
+                                <input type="checkbox" id="double_sided">Double sided
+                            </label>
+                            <label class="feature">
+                                <input type="checkbox" id="logic_based_badges">Logic based badges
+                            </label>
+                            <label class="feature">
+                                <input type="checkbox" id="multi_badge_types">Multiple types of badges by attendee type
+                            </label>
+                            <label class="feature">
+                                <input type="checkbox" id="customer_hardware">Customer using their own hardware
+                            </label>
+                        </span>
+                    </section>
 
-            <section class="module">
-                <h2>Custom</h2>
-                <label class="feature">
-                    <input type="checkbox" id="new_dev">New dev work
-                </label>
-                <label class="feature">
-                    <input type="checkbox" id="integrations">Integrations
-                </label>
-                <label class="feature">
-                    <input type="checkbox" id="SSO">SSO
-                </label>
-            </section>
+                    <section class="module">
+                        <h2>Custom</h2>
+                        <label class="feature">
+                            <input type="checkbox" id="new_dev">New dev work
+                        </label>
+                        <label class="feature">
+                            <input type="checkbox" id="integrations">Integrations
+                        </label>
+                        <label class="feature">
+                            <input type="checkbox" id="SSO">SSO
+                        </label>
+                    </section>
 
-            <section class="module">
-                <h2>Project Management</h2>
-                <label class="feature">
-                    <input type="checkbox" id="multiple_POCs">Multiple POCs / Divisions
-                </label>
-                <label class="feature">
-                    <input type="checkbox" id="recurring_calls">Recurring Calls
-                </label>
-                <label class="feature">
-                    <input type="checkbox" id="more_than_8_events">More than 8 events in a calendar year
-                </label>
-            </section>
-
-            <div class="result-card">
-                <h3>Project Classification:</h3>
-                <div class="classification" id="bre-classification">Waiting for selection...</div>
-                <small><span id="bre-score"></span></small>
-                <div class="classification" id="app-classification"></div>
-                <small><span id="app-score"></span></small>
-                <div class="classification" id="abs-classification"></div>
-                <small><span id="abs-score"></span></small>
-                <div class="classification" id="exh-classification"></div>
-                <small><span id="exh-score"></span></small>
-                <div class="classification" id="appointments-classification"></div>
-                <small><span id="appointments-score"></span></small>
-                <div class="classification" id="kiosk-classification"></div>
-                <small><span id="kiosk-score"></span></small>
-                <div class="classification" id="additional-classification"></div>
-                <small><span id="additional-score"></span></small>
-                <div class="hours" id="total-hours"></div>
-                <div class="button-group">
-                    <button type="button" onclick="window.print()" class="print-btn">
-                        Save as PDF / Print Results
-                    </button>
-                    <button type="button" id="reset-btn" class="reset-btn">Reset All</button>
+                    <section class="module">
+                        <h2>Project Management</h2>
+                        <label class="feature">
+                            <input type="checkbox" id="multiple_POCs">Multiple POCs / Divisions
+                        </label>
+                        <label class="feature">
+                            <input type="checkbox" id="recurring_calls">Recurring Calls
+                        </label>
+                        <label class="feature">
+                            <input type="checkbox" id="more_than_8_events">More than 8 events in a calendar year
+                        </label>
+                    </section>
                 </div>
+                <aside class="sidebar">
+                    <div class="result-card">
+                        <h3>Project Classification:</h3>
+                        <div class="classification" id="bre-classification">Waiting for selection...</div>
+                        <small><span id="bre-score"></span></small>
+                        <div class="classification" id="app-classification"></div>
+                        <small><span id="app-score"></span></small>
+                        <div class="classification" id="abs-classification"></div>
+                        <small><span id="abs-score"></span></small>
+                        <div class="classification" id="exh-classification"></div>
+                        <small><span id="exh-score"></span></small>
+                        <div class="classification" id="appointments-classification"></div>
+                        <small><span id="appointments-score"></span></small>
+                        <div class="classification" id="kiosk-classification"></div>
+                        <small><span id="kiosk-score"></span></small>
+                        <div class="classification" id="additional-classification"></div>
+                        <small><span id="additional-score"></span></small>
+                        <div class="hours" id="total-hours"></div>
+                        <div class="button-group">
+                            <button type="button" onclick="window.print()" class="print-btn">
+                                Save as PDF / Print Results
+                            </button>
+                            <button type="button" id="reset-btn" class="reset-btn">Reset All</button>
+                        </div>
+                    </div>
+                </aside>
             </div>
         </div>
     </div>
