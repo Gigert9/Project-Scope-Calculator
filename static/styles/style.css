@@ -34,7 +34,7 @@ body {
 .sidebar {
     flex: 1;
     position: sticky;
-    top: 0rem;
+    top: 0.8rem;
     height: fit-content;
     max-height: 95vh;
     /* overflow-y: auto; */

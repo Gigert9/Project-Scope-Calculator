@@ -74,7 +74,7 @@ async function updateClassification() {
         updateModuleUI('exh', 'Exhibits', result.exh_score, result.exh_classification);
         updateModuleUI('appointments', 'Appointments', result.appointments_score, result.appointments_classification);
         updateModuleUI('kiosk', 'Kiosk/Badges', result.kiosk_score, result.kiosk_classification);
-        updateModuleUI('additional', 'Additional Hours', result.additional_hours, result.additional_classification)
+        updateModuleUI('additional', 'Custom / PM', result.additional_hours, result.additional_classification)
         // Update Total
         document.getElementById('total-hours').innerText = `Total Project Hours: ${result.total_hours}`;
     } catch (error) {
