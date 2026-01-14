@@ -76,7 +76,7 @@ async function updateClassification() {
         updateModuleUI('kiosk', 'Kiosk/Badges', result.kiosk_score, result.kiosk_classification);
         updateModuleUI('additional', 'Custom / PM', result.additional_hours, result.additional_classification)
         // Update Total
-        document.getElementById('total-hours').innerText = `Total Project Hours: ${result.total_hours}`;
+        document.getElementById('total-hours').innerText = `Total PSC Hours: ${result.total_hours}`;
     } catch (error) {
         console.error('Error:', error);
     }

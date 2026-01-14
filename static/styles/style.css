@@ -1,5 +1,5 @@
 :root {
-    --primary: #2563eb;
+    --primary: #2067b2;
     --bg: #f8fafc;
     --card: #ffffff;
     --text: #1e293b;
@@ -94,8 +94,8 @@ input[type="checkbox"] {
 }
 
 .result-card {
-    background: var(--primary);
-    color: white;
+    background: var(--card);
+    color: var(--text);
     padding: 1rem;
     border-radius: 8px;
     text-align: left;
@@ -134,13 +134,13 @@ input[type="checkbox"] {
 }
 
 .print-btn {
-    background-color: #2563eb;
-    color: white;
+    background-color: #e2e8f0;
+    color: var(--text);
 }
 
 .reset-btn {
     background-color: #e2e8f0;
-    color: #475569;
+    color: var(--text);
 }
 
 .print-btn:hover, .reset-btn:hover {
@@ -148,8 +148,52 @@ input[type="checkbox"] {
 }
 
 @media print {
-    .button-group {
+    .button-group, .print-btn, .reset-btn, .logo-wrapper, input[type="checkbox"] {
         display: none !important;
+    }
+
+    body, .container {
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        background: white;
+    }
+
+    .feature {
+        display: none;
+    }
+
+    .feature:has(input:checked) {
+        display: block;
+        margin-bottom: 5px;
+        font-size: 10pt;
+    }
+
+    .form-sections {
+        display: block;
+    }
+
+    .module, .sidebar {
+        break-inside: avoid;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 15px;
+        margin-bottom: 15px;
+    }
+
+    .result-card {
+        display: block !important;
+        border: 2px slid #333;
+        padding: 20px;
+        margin-top: 20px;
+    }
+
+    .classification, .hours {
+        font-weight: bold;
+        font-size: 12pt;
+    }
+
+    body::after {
+        content: "Generated on: " counter(page);
     }
 
     .site-logo {
