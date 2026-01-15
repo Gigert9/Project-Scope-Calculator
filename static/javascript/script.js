@@ -44,7 +44,6 @@ async function updateClassification() {
         logic_based_badges: isChecked('logic_based_badges'),
         multi_badge_types: isChecked('multi_badge_types'),
         customer_hardware: isChecked('customer_hardware'),
-        new_dev: isChecked('new_dev'),
         integrations: isChecked('integrations'),
         SSO: isChecked('SSO'),
         multiple_POCs: isChecked('multiple_POCs'),

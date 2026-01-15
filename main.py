@@ -52,7 +52,6 @@ class ProjectFeatures(BaseModel):
     logic_based_badges: bool = False
     multi_badge_types: bool = False
     customer_hardware: bool = False
-    new_dev: bool = False
     integrations: bool = False
     SSO: bool = False
     multiple_POCs: bool = False
@@ -115,7 +114,6 @@ def calculate_classification(features: ProjectFeatures):
     if features.multi_badge_types: KIOSK_SCORE += 1
     if features.customer_hardware: KIOSK_SCORE += 1
     ## CUSTOM
-    if features.new_dev: CUSTOM_SCORE += 1
     if features.integrations: CUSTOM_SCORE += 1
     if features.SSO: CUSTOM_SCORE += 1
     ## PROJECT MANAGEMENT
