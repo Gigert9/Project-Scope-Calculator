@@ -22,10 +22,11 @@
                 <div class="form-sections">
                     <section class="module">
                         <h2>Attendee Registration</h2>
-                        <label class="feature">
-                            <input type="checkbox" id="bre_noscope">Not in Scope
+                        <label class="feature base-toggle">
+                            <input type="checkbox" id="bre_include">Basic Implementation
                         </label>
-                        <span id="bre-features">
+                        <span id="bre-features" style="display: none;">
+                            <p><small>Select additional complexities:</small></p>
                             <label class="feature">
                                 <input type="checkbox" id="workflows">More than 3 workflows
                             </label>
@@ -54,11 +55,12 @@
                     </section>
 
                     <section class="module">
-                        <h2>APP and CO</h2>
-                        <label class="feature">
-                            <input type="checkbox" id="app_noscope">Not in Scope
+                        <h2>Mobile App (Connect) and Connect Online</h2>
+                        <label class="feature base-toggle">
+                            <input type="checkbox" id="app_include">Basic Implementation
                         </label>
-                        <span id="app-features">
+                        <span id="app-features" style="display: none;">
+                            <p><small>Select additional complexities:</small></p>
                             <label class="feature">
                                 <input type="checkbox" id="hybrid_virtual">Hybrid or Virtual
                             </label>
@@ -81,65 +83,12 @@
                     </section>
 
                     <section class="module">
-                        <h2>Abstract</h2>
-                        <label class="feature">
-                            <input type="checkbox" id="abs_noscope">Not in Scope
+                        <h2>Kiosk / Badge Printing</h2>
+                        <label class="feature base-toggle">
+                            <input type="checkbox" id="kiosk_include">Basic Implementation
                         </label>
-                        <span id="abs-features">
-                            <label class="feature">
-                                <input type="checkbox" id="complex_workflows">Complex workflows for submission
-                            </label>
-                            <label class="feature">
-                                <input type="checkbox" id="multiple_review_rounds">Multiple rounds of review
-                            </label>
-                            <label class="feature">
-                                <input type="checkbox" id="multiple_proposal_calls">Multiple calls for proposals
-                            </label>
-                        </span>
-                    </section>
-
-                    <section class="module">
-                        <h2>Exhibits</h2>
-                        <label class="feature">
-                            <input type="checkbox" id="exh_noscope">Not in Scope
-                        </label>
-                        <span id="exh-features">
-                            <label class="feature">
-                                <input type="checkbox" id="floor_plan">Floor plans
-                            </label>
-                            <label class="feature">
-                                <input type="checkbox" id="year_round">Year-Round
-                            </label>
-                            <label class="feature">
-                                <input type="checkbox" id="complex_sponsors">Complex sponsorship options
-                            </label>
-                        </span>
-                    </section>
-
-                    <section class="module">
-                        <h2>Appointments</h2>
-                        <label class="feature">
-                            <input type="checkbox" id="appointments_noscope">Not in Scope
-                        </label>
-                        <span id="appointment-features">
-                            <label class="feature">
-                                <input type="checkbox" id="multi_scheduling">Multiple types of scheduling
-                            </label>
-                            <label class="feature">
-                                <input type="checkbox" id="first_time_system">First time appointment system user
-                            </label>
-                            <label class="feature">
-                                <input type="checkbox" id="matchmaking">Matchmaking required
-                            </label>
-                        </span>
-                    </section>
-
-                    <section class="module">
-                        <h2>Kiosk / Badges</h2>
-                        <label class="feature">
-                            <input type="checkbox" id="kiosk_noscope">Not in Scope
-                        </label>
-                        <span id="kiosk-features">
+                        <span id="kiosk-features" style="display: none;">
+                            <p><small>Select additional complexities:</small></p>
                             <label class="feature">
                                 <input type="checkbox" id="personal_agenda">Personal Agenda
                             </label>
@@ -159,7 +108,64 @@
                     </section>
 
                     <section class="module">
-                        <h2>Custom</h2>
+                        <h2>Exhibitor Registration / Booth Selection</h2>
+                        <label class="feature base-toggle">
+                            <input type="checkbox" id="exh_include">Basic Implementation
+                        </label>
+                        <span id="exh-features" style="display: none;">
+                            <p><small>Select additional complexities:</small></p>
+                            <label class="feature">
+                                <input type="checkbox" id="floor_plan">Floor plans
+                            </label>
+                            <label class="feature">
+                                <input type="checkbox" id="year_round">Year-Round
+                            </label>
+                            <label class="feature">
+                                <input type="checkbox" id="complex_sponsors">Complex sponsorship options
+                            </label>
+                        </span>
+                    </section>
+
+                    <section class="module">
+                        <h2>Abstract / Speaker Management</h2>
+                        <label class="feature base-toggle">
+                            <input type="checkbox" id="abs_include">Basic Implementation
+                        </label>
+                        <span id="abs-features" style="display: none;">
+                            <p><small>Select additional complexities:</small></p>
+                            <label class="feature">
+                                <input type="checkbox" id="complex_workflows">Complex workflows for submission
+                            </label>
+                            <label class="feature">
+                                <input type="checkbox" id="multiple_review_rounds">Multiple rounds of review
+                            </label>
+                            <label class="feature">
+                                <input type="checkbox" id="multiple_proposal_calls">Multiple calls for proposals
+                            </label>
+                        </span>
+                    </section>
+
+                    <section class="module">
+                        <h2>Appointment Management</h2>
+                        <label class="feature base-toggle">
+                            <input type="checkbox" id="appointments_include">Basic Implementation
+                        </label>
+                        <span id="appointment-features" style="display: none;">
+                            <p><small>Select additional complexities:</small></p>
+                            <label class="feature">
+                                <input type="checkbox" id="multi_scheduling">Multiple types of scheduling
+                            </label>
+                            <label class="feature">
+                                <input type="checkbox" id="first_time_system">First time appointment system user
+                            </label>
+                            <label class="feature">
+                                <input type="checkbox" id="matchmaking">Matchmaking required
+                            </label>
+                        </span>
+                    </section>
+
+                    <section class="module">
+                        <h2>Custom / Development</h2>
                         <label class="feature">
                             <input type="checkbox" id="new_dev">New dev work
                         </label>

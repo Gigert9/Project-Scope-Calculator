@@ -58,12 +58,12 @@ class ProjectFeatures(BaseModel):
     multiple_POCs: bool = False
     recurring_calls: bool = False
     more_than_8_events: bool = False
-    bre_noscope: bool = False
-    app_noscope: bool = False
-    abs_noscope: bool = False
-    exh_noscope: bool = False
-    appointments_noscope: bool = False
-    kiosk_noscope: bool = False
+    bre_include: bool = False
+    app_include: bool = False
+    abs_include: bool = False
+    exh_include: bool = False
+    appointments_include: bool = False
+    kiosk_include: bool = False
 
 @app.get("/")
 def index():
@@ -81,14 +81,14 @@ def calculate_classification(features: ProjectFeatures):
     PM_SCORE = 0
     
     ## ATTENDEE REGISTRATION
-    if features.workflows: BRE_SCORE += 1
-    if features.field_logic: BRE_SCORE += 1
-    if features.product_logic: BRE_SCORE += 1
-    if features.session_logic: BRE_SCORE += 1
-    if features.complex_reporting: BRE_SCORE += 1
-    if features.housing: BRE_SCORE += 1
-    if features.table_seating: BRE_SCORE += 1
-    if features.lookup_integration: BRE_SCORE += 1
+    if features.workflows: BRE_SCORE += 0.5
+    if features.field_logic: BRE_SCORE += 2
+    if features.product_logic: BRE_SCORE += 2
+    if features.session_logic: BRE_SCORE += 2
+    if features.complex_reporting: BRE_SCORE += 3
+    if features.housing: BRE_SCORE += 2
+    if features.table_seating: BRE_SCORE += 2
+    if features.lookup_integration: BRE_SCORE += 0.5
     ## APP and CO 
     if features.hybrid_virtual: APP_SCORE += 1
     if features.multi_event: APP_SCORE += 1
@@ -123,101 +123,107 @@ def calculate_classification(features: ProjectFeatures):
     if features.recurring_calls: PM_SCORE += 1
     if features.more_than_8_events: PM_SCORE += 1
 
-    if features.bre_noscope: 
+    if not features.bre_include: 
         bre_hours = 0
         BRE_result = "N/A"
-    elif BRE_SCORE <= 0 and not features.bre_noscope:
-        BRE_result = "Low"
-        bre_hours = 10
-    elif BRE_SCORE <= 3:
-        BRE_result = "Medium"
-        bre_hours = 25
-    elif BRE_SCORE <= 6:
-        BRE_result = "High"
-        bre_hours = 50
     else:
-        BRE_result = "Extreme"
-        bre_hours = 100
+        if BRE_SCORE <= 0:
+            BRE_result = "Low"
+            bre_hours = 10
+        elif BRE_SCORE <= 5:
+            BRE_result = "Medium"
+            bre_hours = 25
+        elif BRE_SCORE <= 7:
+            BRE_result = "High"
+            bre_hours = 50
+        else:
+            BRE_result = "Extreme"
+            bre_hours = 100
 
-    if features.app_noscope:
+    if not features.app_include:
         app_hours = 0
         APP_result = "N/A"
-    elif APP_SCORE <= 0 and not features.app_noscope:
-        APP_result = "Low"
-        app_hours = 5
-    elif APP_SCORE <= 2:
-        APP_result = "Medium"
-        app_hours = 10
-    elif APP_SCORE <= 4:
-        APP_result = "High"
-        app_hours = 25
     else:
-        APP_result = "Extreme"
-        app_hours = 50
+        if APP_SCORE <= 0:
+            APP_result = "Low"
+            app_hours = 5
+        elif APP_SCORE <= 2:
+            APP_result = "Medium"
+            app_hours = 10
+        elif APP_SCORE <= 4:
+            APP_result = "High"
+            app_hours = 25
+        else:
+            APP_result = "Extreme"
+            app_hours = 50
 
-    if features.abs_noscope:
+    if not features.abs_include:
         abs_hours = 0
         ABS_result = "N/A"
-    elif ABS_SCORE <= 0 and not features.abs_noscope:
-        ABS_result = "Low"
-        abs_hours = 5
-    elif ABS_SCORE <= 1:
-        ABS_result = "Medium"
-        abs_hours = 10
-    elif ABS_SCORE <= 2:
-        ABS_result = "High"
-        abs_hours = 15
     else:
-        ABS_result = "Extreme"
-        abs_hours = 30
+        if ABS_SCORE <= 0:
+            ABS_result = "Low"
+            abs_hours = 5
+        elif ABS_SCORE <= 1:
+            ABS_result = "Medium"
+            abs_hours = 10
+        elif ABS_SCORE <= 2:
+            ABS_result = "High"
+            abs_hours = 15
+        else:
+            ABS_result = "Extreme"
+            abs_hours = 30
 
-    if features.exh_noscope:
+    if not features.exh_include:
         exh_hours = 0
         EXH_result = "N/A"
-    elif EXH_SCORE <= 0 and not features.exh_noscope:
-        EXH_result = "Low"
-        exh_hours = 5
-    elif EXH_SCORE <= 1:
-        EXH_result = "Medium"
-        exh_hours = 10
-    elif EXH_SCORE <= 2:
-        EXH_result = "High"
-        exh_hours = 20
     else:
-        EXH_result = "Extreme"
-        exh_hours = 40
+        if EXH_SCORE <= 0:
+            EXH_result = "Low"
+            exh_hours = 5
+        elif EXH_SCORE <= 1:
+            EXH_result = "Medium"
+            exh_hours = 10
+        elif EXH_SCORE <= 2:
+            EXH_result = "High"
+            exh_hours = 20
+        else:
+            EXH_result = "Extreme"
+            exh_hours = 40
 
-    if features.appointments_noscope:
+    if not features.appointments_include:
         appointments_hours = 0
         APPOINTMENTS_result = "N/A"
-    elif APPOINTMENTS_SCORE <= 0 and not features.appointments_noscope:
-        APPOINTMENTS_result = "Low"
-        appointments_hours = 5
-    elif APPOINTMENTS_SCORE <= 1:
-        APPOINTMENTS_result = "Medium"
-        appointments_hours = 10
-    elif APPOINTMENTS_SCORE <= 2:
-        APPOINTMENTS_result = "High"
-        appointments_hours = 25
     else:
-        APPOINTMENTS_result = "Extreme"
-        appointments_hours = 50
+        if APPOINTMENTS_SCORE <= 0:
+            APPOINTMENTS_result = "Low"
+            appointments_hours = 5
+        elif APPOINTMENTS_SCORE <= 1:
+            APPOINTMENTS_result = "Medium"
+            appointments_hours = 10
+        elif APPOINTMENTS_SCORE <= 2:
+            APPOINTMENTS_result = "High"
+            appointments_hours = 25
+        else:
+            APPOINTMENTS_result = "Extreme"
+            appointments_hours = 50
 
-    if features.kiosk_noscope:
+    if not features.kiosk_include:
         kiosk_hours = 0
         KIOSK_result = "N/A"
-    elif KIOSK_SCORE <= 0 and not features.kiosk_noscope:
-        KIOSK_result = "Low"
-        kiosk_hours = 5
-    elif KIOSK_SCORE <= 1:
-        KIOSK_result = "Medium"
-        kiosk_hours = 10
-    elif KIOSK_SCORE <= 2:
-        KIOSK_result = "High"
-        kiosk_hours = 15
     else:
-        KIOSK_result = "Extreme"
-        kiosk_hours = 30
+        if KIOSK_SCORE <= 0:
+            KIOSK_result = "Low"
+            kiosk_hours = 5
+        elif KIOSK_SCORE <= 1:
+            KIOSK_result = "Medium"
+            kiosk_hours = 10
+        elif KIOSK_SCORE <= 2:
+            KIOSK_result = "High"
+            kiosk_hours = 15
+        else:
+            KIOSK_result = "Extreme"
+            kiosk_hours = 30
 
     if CUSTOM_SCORE + PM_SCORE == 0:
         additional_hours = 0
