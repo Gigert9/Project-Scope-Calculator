@@ -125,7 +125,7 @@ def calculate_classification(features: ProjectFeatures):
         bre_hours = 0
         BRE_result = "N/A"
     else:
-        if BRE_SCORE <= 0:
+        if BRE_SCORE < 1:
             BRE_result = "Low"
             bre_hours = 10
         elif BRE_SCORE <= 5:
