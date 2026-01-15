@@ -34,7 +34,6 @@ class ProjectFeatures(BaseModel):
     lookup_integration: bool = False
     hybrid_virtual: bool = False
     multi_event: bool = False
-    wayfinding: bool = False
     CEUs: bool = False
     sponsor_branding: bool = False
     leads: bool = False
@@ -64,6 +63,12 @@ class ProjectFeatures(BaseModel):
     appointments_include: bool = False
     kiosk_include: bool = False
 
+DESCRIPTIONS = {
+    "A": "Additional kick off call / follow ups and questions",
+    "B": "Additional training",
+    "C": "Review and testing work"
+}
+
 @app.get("/")
 def index():
     return FileResponse('html/index.html')
@@ -78,48 +83,113 @@ def calculate_classification(features: ProjectFeatures):
     KIOSK_SCORE = 0
     CUSTOM_SCORE = 0
     PM_SCORE = 0
+
+    active_keys = set()
     
     ## ATTENDEE REGISTRATION
-    if features.workflows: BRE_SCORE += 0.5
-    if features.field_logic: BRE_SCORE += 2
-    if features.product_logic: BRE_SCORE += 2
-    if features.session_logic: BRE_SCORE += 2
-    if features.complex_reporting: BRE_SCORE += 3
-    if features.housing: BRE_SCORE += 2
-    if features.table_seating: BRE_SCORE += 2
-    if features.lookup_integration: BRE_SCORE += 0.5
+    if features.workflows: 
+        BRE_SCORE += 0.5 
+        active_keys.update(["A", "B", "C"])
+    if features.field_logic: 
+        BRE_SCORE += 2
+        active_keys.update(["A", "B", "C"])
+    if features.product_logic: 
+        BRE_SCORE += 2
+        active_keys.update(["A", "B", "C"])
+    if features.session_logic: 
+        BRE_SCORE += 2
+        active_keys.update(["A", "B", "C"])
+    if features.complex_reporting: 
+        BRE_SCORE += 3
+        active_keys.update(["A", "B", "C"])
+    if features.housing: 
+        BRE_SCORE += 2
+        active_keys.update(["B", "C"])
+    if features.table_seating: 
+        BRE_SCORE += 2
+        active_keys.update(["B", "C"])
+    if features.lookup_integration: 
+        BRE_SCORE += 0.5
+        active_keys.update(["A", "C"])
     ## APP and CO 
-    if features.hybrid_virtual: APP_SCORE += 1
-    if features.multi_event: APP_SCORE += 1
-    if features.wayfinding: APP_SCORE += 1
-    if features.CEUs: APP_SCORE += 1
-    if features.sponsor_branding: APP_SCORE += 1
-    if features.leads: APP_SCORE += 1
+    if features.hybrid_virtual: 
+        APP_SCORE += 3
+        active_keys.update(["A", "B", "C"])
+    if features.multi_event: 
+        APP_SCORE += 0.5
+        active_keys.update(["B"])
+    if features.CEUs: 
+        APP_SCORE += 3
+        active_keys.update(["A"])
+    if features.sponsor_branding: 
+        APP_SCORE += 1
+        active_keys.update(["A", "B"])
+    if features.leads: 
+        APP_SCORE += 0.5
+        active_keys.update(["B"])
     ## ABSTRACT
-    if features.complex_workflows: ABS_SCORE += 1
-    if features.multiple_review_rounds: ABS_SCORE += 1
-    if features.multiple_proposal_calls: ABS_SCORE += 1
+    if features.complex_workflows: 
+        ABS_SCORE += 1
+        active_keys.update(["A", "B", "C"])
+    if features.multiple_review_rounds: 
+        ABS_SCORE += 1
+        active_keys.update(["A"])
+    if features.multiple_proposal_calls: 
+        ABS_SCORE += 1
+        active_keys.update(["A"])
     ## EXHIBITOR REGISTRATION
-    if features.floor_plan: EXH_SCORE += 1
-    if features.year_round: EXH_SCORE += 1
-    if features.complex_sponsors: EXH_SCORE += 1
+    if features.floor_plan: 
+        EXH_SCORE += 1
+        active_keys.update(["B", "C"])
+    if features.year_round: 
+        EXH_SCORE += 1
+        active_keys.update(["A", "B", "C"])
+    if features.complex_sponsors: 
+        EXH_SCORE += 1
+        active_keys.update(["B", "C"])
     ## APPOINTMENTS
-    if features.multi_scheduling: APPOINTMENTS_SCORE += 1
-    if features.first_time_system: APPOINTMENTS_SCORE += 1
-    if features.matchmaking: APPOINTMENTS_SCORE += 1
+    if features.multi_scheduling: 
+        APPOINTMENTS_SCORE += 1
+        active_keys.update(["A", "B", "C"])
+    if features.first_time_system: 
+        APPOINTMENTS_SCORE += 1
+        active_keys.update(["A", "B", "C"])
+    if features.matchmaking: 
+        APPOINTMENTS_SCORE += 1
+        active_keys.update(["B", "C"])
     ## KIOSK/BADGES
-    if features.personal_agenda: KIOSK_SCORE += 1
-    if features.double_sided: KIOSK_SCORE += 1
-    if features.logic_based_badges: KIOSK_SCORE += 1
-    if features.multi_badge_types: KIOSK_SCORE += 1
-    if features.customer_hardware: KIOSK_SCORE += 1
+    if features.personal_agenda: 
+        KIOSK_SCORE += 1
+        active_keys.update(["A", "C"])
+    if features.double_sided: 
+        KIOSK_SCORE += 1
+        active_keys.update(["A", "C"])
+    if features.logic_based_badges: 
+        KIOSK_SCORE += 1
+        active_keys.update(["A", "B", "C"])
+    if features.multi_badge_types: 
+        KIOSK_SCORE += 1
+        active_keys.update(["A", "B", "C"])
+    if features.customer_hardware: 
+        KIOSK_SCORE += 1
+        active_keys.update(["A", "B", "C"])
     ## CUSTOM
-    if features.integrations: CUSTOM_SCORE += 1
-    if features.SSO: CUSTOM_SCORE += 1
+    if features.integrations: 
+        CUSTOM_SCORE += 1
+        active_keys.update(["A", "C"])
+    if features.SSO: 
+        CUSTOM_SCORE += 1
+        active_keys.update(["A", "C"])
     ## PROJECT MANAGEMENT
-    if features.multiple_POCs: PM_SCORE += 1
-    if features.recurring_calls: PM_SCORE += 1
-    if features.more_than_8_events: PM_SCORE += 1
+    if features.multiple_POCs: 
+        PM_SCORE += 1
+        active_keys.update(["A", "B"])
+    if features.recurring_calls: 
+        PM_SCORE += 1
+        active_keys.update(["A"])
+    if features.more_than_8_events: 
+        PM_SCORE += 1
+        active_keys.update(["A"])
 
     if not features.bre_include: 
         bre_hours = 0
@@ -142,13 +212,13 @@ def calculate_classification(features: ProjectFeatures):
         app_hours = 0
         APP_result = "N/A"
     else:
-        if APP_SCORE <= 0:
+        if APP_SCORE < 1:
             APP_result = "Low"
             app_hours = 5
-        elif APP_SCORE <= 2:
+        elif APP_SCORE <= 3:
             APP_result = "Medium"
             app_hours = 10
-        elif APP_SCORE <= 4:
+        elif APP_SCORE <= 6:
             APP_result = "High"
             app_hours = 25
         else:
@@ -239,6 +309,8 @@ def calculate_classification(features: ProjectFeatures):
 
     total_hours = bre_hours + app_hours + abs_hours + exh_hours + appointments_hours + kiosk_hours + additional_hours
 
+    final_reasons = [DESCRIPTIONS[k] for k in sorted(active_keys)]
+
     return {
         "bre_score": bre_hours,
         "bre_classification": BRE_result,
@@ -254,5 +326,6 @@ def calculate_classification(features: ProjectFeatures):
         "kiosk_classification": KIOSK_result,
         "additional_hours": additional_hours,
         "additional_classification": additional_result,
-        "total_hours": total_hours
+        "total_hours": total_hours,
+        "reasons": final_reasons
     }

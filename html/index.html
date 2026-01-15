@@ -68,9 +68,6 @@
                                 <input type="checkbox" id="multi_event">Multi-Event App
                             </label>
                             <label class="feature">
-                                <input type="checkbox" id="wayfinding">Wayfinding
-                            </label>
-                            <label class="feature">
                                 <input type="checkbox" id="CEUs">Complex CEs
                             </label>
                             <label class="feature">
@@ -204,6 +201,11 @@
                         <small><span id="kiosk-score"></span></small>
                         <div class="classification" id="additional-classification"></div>
                         <small><span id="additional-score"></span></small>
+                        <div id="reasons-container" style="display: none; margin-top: 1rem; border-top: 1px solid var(--border); padding-top: 1rem;">
+                            <h4 style="margin: 0 0 0.5rem 0; font-size: 0.9rem; color: var(--primary);">Scope Justification:</h4>
+                            <ul id="reasons-list" style="margin: 0; padding-left: 1.2rem; font-size: 0.85rem; color: #475569;">
+                                </ul>
+                        </div>
                         <div class="hours" id="total-hours"></div>
                         <div class="button-group">
                             <button type="button" onclick="window.print()" class="print-btn">

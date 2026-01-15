@@ -26,7 +26,6 @@ async function updateClassification() {
         lookup_integration: isChecked('lookup_integration'),
         hybrid_virtual: isChecked('hybrid_virtual'),
         multi_event: isChecked('multi_event'),
-        wayfinding: isChecked('wayfinding'),
         CEUs: isChecked('CEUs'),
         sponsor_branding: isChecked('sponsor_branding'),
         leads: isChecked('leads'),
@@ -60,6 +59,22 @@ async function updateClassification() {
 
         if (!response.ok) throw new Error('Network response was not ok');
         const result = await response.json();
+
+        const reasonsContainer = document.getElementById('reasons-container');
+        const reasonsList = document.getElementById('reasons-list');
+        reasonsList.innerHTML = '';
+
+        if (result.reasons && result.reasons.length > 0) {
+            reasonsContainer.style.display = 'block';
+            
+            result.reasons.forEach(reason => {
+                const li = document.createElement('li');
+                li.textContent = reason;
+                reasonsList.appendChild(li);
+            });
+        } else {
+            reasonsContainer.style.display = 'none';
+        }
 
         const updateModuleUI = (prefix, label, score, classification) => {
             const classEl = document.getElementById(`${prefix}-classification`);
@@ -128,6 +143,9 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('reset-btn').addEventListener('click', () => {
         document.querySelectorAll('input[type="checkbox"]').forEach(box => box.checked = false);
         document.querySelectorAll('[id$="-features"]').forEach(span => span.style.display = 'none');
+
+        document.getElementById('reasons-container').style.display = 'none';
+        document.getElementById('reasons-list').innerHTML = '';
         
         const sections = ['bre', 'app', 'abs', 'exh', 'appointments', 'kiosk', 'additional'];
         sections.forEach(s => {

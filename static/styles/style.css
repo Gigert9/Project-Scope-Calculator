@@ -37,7 +37,7 @@ body {
     top: 0.8rem;
     height: fit-content;
     max-height: 95vh;
-    /* overflow-y: auto; */
+    overflow-y: auto;
 }
 
 h1 {
@@ -195,6 +195,15 @@ input[type="checkbox"] {
     .site-logo {
         max-width: 150px;
     }
+
+    #reasons-container {
+        display: block !important;
+        border-top: 1px solid #333 !important;
+    }
+    
+    #reasons-list {
+        color: black !important;
+    }
 }
 
 @media (max-width: 850px) {
@@ -206,4 +215,9 @@ input[type="checkbox"] {
         position: static;
         width: 100%;
     }
+}
+
+#reasons-list li {
+    margin-bottom: 4px;
+    line-height: 1.3;
 }
