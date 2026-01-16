@@ -94,7 +94,7 @@ async function updateClassification() {
         updateModuleUI('abs', 'Abstract', result.abs_score, result.abs_classification);
         updateModuleUI('exh', 'Exhibits', result.exh_score, result.exh_classification);
         updateModuleUI('appointments', 'Appointments', result.appointments_score, result.appointments_classification);
-        updateModuleUI('kiosk', 'Kiosk/Badges', result.kiosk_score, result.kiosk_classification);
+        updateModuleUI('kiosk', 'Kiosk / Badges', result.kiosk_score, result.kiosk_classification);
         updateModuleUI('additional', 'Custom / PM', result.additional_hours, result.additional_classification);
         
         document.getElementById('total-hours').innerText = `Total PSC Hours: ${result.total_hours}`;
@@ -144,7 +144,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('input[type="checkbox"]').forEach(box => box.checked = false);
         document.querySelectorAll('[id$="-features"]').forEach(span => span.style.display = 'none');
 
-        document.getElementById('reasons-container').style.display = 'none';
+        document.getElementById('reasons-container').style.display = 'none';                                                                                                                                                
         document.getElementById('reasons-list').innerHTML = '';
         
         const sections = ['bre', 'app', 'abs', 'exh', 'appointments', 'kiosk', 'additional'];
