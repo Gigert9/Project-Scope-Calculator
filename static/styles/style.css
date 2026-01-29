@@ -125,7 +125,7 @@ input[type="checkbox"] {
 }
 
 .print-btn, .reset-btn, .email-btn {
-    flex: 1;
+    flex: 1 1 180px;
     padding: 12px;
     border-radius: 6px;
     font-weight: bold;
@@ -151,6 +151,7 @@ input[type="checkbox"] {
     border-radius: 8px;
     padding: 1rem;
     margin: 1rem 0 1.25rem 0;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
 .customer-field {
@@ -166,6 +167,7 @@ input[type="checkbox"] {
     border: 1px solid var(--border);
     border-radius: 6px;
     font-size: 0.95rem;
+    background: #fff;
 }
 
 .required {
@@ -213,6 +215,10 @@ input[type="checkbox"] {
 
 @media print {
     .button-group, .print-btn, .reset-btn, .email-btn, .logo-wrapper, input[type="checkbox"], .customer-bar, #email-status {
+        display: none !important;
+    }
+
+    .instructions {
         display: none !important;
     }
 
@@ -296,4 +302,10 @@ input[type="checkbox"] {
 #reasons-list li {
     margin-bottom: 4px;
     line-height: 1.3;
+}
+
+/* JS adds this class to show per-module breakdown items */
+#reasons-list li.sub-item {
+    margin-left: 14px;
+    list-style-type: circle;
 }

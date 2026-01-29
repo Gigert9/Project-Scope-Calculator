@@ -106,13 +106,36 @@ async function updateClassification() {
         const reasonsList = document.getElementById('reasons-list');
         if (reasonsList) reasonsList.innerHTML = '';
 
-        // Supports either `result.justifications` (new) or `result.reasons` (legacy strings)
-        const breakdown = result.justifications || null;
+        const moduleBreakdowns = result.module_breakdowns || null;
 
-        if (breakdown && Array.isArray(breakdown) && breakdown.length > 0) {
+        if (moduleBreakdowns && typeof moduleBreakdowns === 'object') {
+            const entries = Object.values(moduleBreakdowns)
+                .filter(m => m && m.total_hours && m.total_hours > 0);
+
+            if (entries.length > 0) {
+                reasonsContainer.style.display = 'block';
+
+                entries.forEach(m => {
+                    const headerLi = document.createElement('li');
+                    headerLi.innerHTML = `<strong>${m.label}</strong> — ${m.total_hours} hour${m.total_hours === 1 ? '' : 's'}`;
+                    reasonsList.appendChild(headerLi);
+
+                    if (Array.isArray(m.items) && m.items.length > 0) {
+                        m.items.forEach(item => {
+                            if (!item || !item.hours || item.hours <= 0) return;
+                            const li = document.createElement('li');
+                            li.textContent = `${item.label}: ${item.hours} hour${item.hours === 1 ? '' : 's'}`;
+                            li.classList.add('sub-item');
+                            reasonsList.appendChild(li);
+                        });
+                    }
+                });
+            } else {
+                reasonsContainer.style.display = 'none';
+            }
+        } else if (result.justifications && Array.isArray(result.justifications) && result.justifications.length > 0) {
             reasonsContainer.style.display = 'block';
-
-            breakdown.forEach(item => {
+            result.justifications.forEach(item => {
                 const li = document.createElement('li');
                 li.textContent = `${item.label}: ${item.hours} hour${item.hours === 1 ? '' : 's'}`;
                 reasonsList.appendChild(li);
@@ -128,26 +151,26 @@ async function updateClassification() {
             reasonsContainer.style.display = 'none';
         }
 
-        const updateModuleUI = (prefix, label, score, classification) => {
+        const updateModuleUI = (prefix, label, hours) => {
             const classEl = document.getElementById(`${prefix}-classification`);
             const scoreEl = document.getElementById(`${prefix}-score`);
 
-            if (classification === 'N/A' || !classification) {
-                classEl.innerText = '';
+            if (classEl) classEl.innerText = '';
+
+            if (!hours || hours === 0) {
                 scoreEl.innerText = '';
             } else {
-                classEl.innerText = `${label} Classification: ${classification}`;
-                scoreEl.innerText = `${label} Hours: ${score}`;
+                scoreEl.innerText = `${label} Hours: ${hours}`;
             }
         };
 
-        updateModuleUI('bre', 'Attendee Registration', result.bre_score, result.bre_classification);
-        updateModuleUI('app', 'APP and CO', result.app_score, result.app_classification);
-        updateModuleUI('abs', 'Abstract', result.abs_score, result.abs_classification);
-        updateModuleUI('exh', 'Exhibits', result.exh_score, result.exh_classification);
-        updateModuleUI('appointments', 'Appointments', result.appointments_score, result.appointments_classification);
-        updateModuleUI('kiosk', 'Kiosk / Badges', result.kiosk_score, result.kiosk_classification);
-        updateModuleUI('additional', 'Custom / PM', result.additional_hours, result.additional_classification);
+        updateModuleUI('bre', 'Attendee Registration', result.bre_score);
+        updateModuleUI('app', 'APP and CO', result.app_score);
+        updateModuleUI('abs', 'Abstract', result.abs_score);
+        updateModuleUI('exh', 'Exhibits', result.exh_score);
+        updateModuleUI('appointments', 'Appointments', result.appointments_score);
+        updateModuleUI('kiosk', 'Kiosk / Badges', result.kiosk_score);
+        updateModuleUI('additional', 'Custom / PM', result.additional_hours);
 
         document.getElementById('total-hours').innerText = `Total PSC Hours: ${result.total_hours}`;
     } catch (error) {
@@ -192,16 +215,32 @@ async function emailResults() {
             body: JSON.stringify(payload),
         });
 
-        const data = await response.json().catch(() => ({}));
+        let detail = '';
+        try {
+            const data = await response.json();
+            detail = (data && data.detail) ? String(data.detail) : '';
+        } catch {
+            try {
+                detail = await response.text();
+            } catch {
+                detail = '';
+            }
+        }
+
         if (!response.ok) {
-            throw new Error(data.detail || 'Email failed');
+            throw new Error(detail || `Email failed (${response.status})`);
         }
 
         setEmailStatus('Email sent.');
         setTimeout(() => setEmailStatus(''), 4000);
     } catch (err) {
         console.error(err);
-        setEmailStatus(`Email error: ${err.message || err}`);
+        const msg = String(err && (err.message || err) ? (err.message || err) : 'Email failed');
+        if (msg.includes('NetworkError') || msg.includes('Failed to fetch') || msg.includes('Load failed')) {
+            setEmailStatus('Email error: Could not reach the server. Confirm the app is running and you are using http://127.0.0.1:8010/ (not a static file or Live Server).');
+        } else {
+            setEmailStatus(`Email error: ${msg}`);
+        }
     }
 }
 

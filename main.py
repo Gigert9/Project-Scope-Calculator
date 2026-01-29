@@ -1,15 +1,32 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
-from pydantic import BaseModel, EmailStr
+from fastapi.responses import FileResponse, Response
+from pydantic import BaseModel
+import asyncio
 import os
 import smtplib
+import sys
 from email.message import EmailMessage
+from email.utils import parseaddr
 from typing import Dict, List, Any
 import env
 
-from playwright.async_api import async_playwright
+# Playwright spawns subprocesses; on Windows, the Selector event loop policy
+# does not implement subprocess APIs and can raise NotImplementedError().
+if sys.platform == "win32":
+    try:
+        asyncio.set_event_loop_policy(asyncio.WindowsProactorEventLoopPolicy())
+    except Exception:
+        # If this fails for any reason, let runtime surface the error.
+        pass
+
+SMTP_HOST= env.SMTP_HOST
+SMTP_PORT=env.SMTP_PORT
+SMTP_USE_TLS=env.SMTP_USE_TLS
+SMTP_USERNAME=env.SMTP_USERNAME
+SMTP_PASSWORD=env.SMTP_PASSWORD
+SMTP_FROM=env.SMTP_FROM
 
 
 app = FastAPI()
@@ -74,7 +91,12 @@ class ProjectFeatures(BaseModel):
 
 
 class EmailRequest(BaseModel):
-    to_email: EmailStr
+    to_email: str
+    customer_name: str
+    features: ProjectFeatures
+
+
+class PdfRequest(BaseModel):
     customer_name: str
     features: ProjectFeatures
 
@@ -83,14 +105,222 @@ class EmailRequest(BaseModel):
 def index():
     return FileResponse('html/index.html')
 
+@app.get("/health")
+def health():
+    return {"ok": True}
+
 DESCRIPTIONS = {
     "A": "Additional kick off call / follow ups and questions",
     "B": "Additional training",
     "C": "Review and testing work"
 }
 
+JUSTIFICATIONS: Dict[str, str] = {
+    "kickoff_wrapup": "Kick Off and Wrap Up calls",
+    "module_training": "Module Level Training",
+    "support": "Feedback, Questions, and Support",
+    "build_config": "Build and Configure",
+    "review_testing": "Review and Testing",
+    "prepost_meetings": "Meetings for pre and post launch",
+}
+
+FEATURE_RULES: Dict[str, Dict[str, Any]] = {
+    # --- Attendee Registration (BRE) ---
+    "bre_include": {
+        "module": "bre",
+        "requires": None,
+        "hours": {
+            "kickoff_wrapup": 2,
+            "module_training": 2,
+            "support": 2,
+            "build_config": 2,
+            "review_testing": 1,
+            "prepost_meetings": 1,
+        },
+    },
+    "workflows": {
+        "module": "bre",
+        "requires": "bre_include",
+        "hours": {
+            "support": 2,
+            "build_config": 2,
+            "review_testing": 2,
+        },
+    },
+
+    "field_logic": {
+        "module": "bre",
+        "requires": "bre_include",
+        "hours": {
+            "module_training": 1,
+            "support": 3,
+            "build_config": 4,
+            "review_testing": 2,
+        },
+    },
+    "product_logic": {
+        "module": "bre",
+        "requires": "bre_include",
+        "hours": {
+            "module_training": 1,
+            "support": 3,
+            "build_config": 4,
+            "review_testing": 2,
+        },
+    },
+    "session_logic": {
+        "module": "bre",
+        "requires": "bre_include",
+        "hours": {
+            "module_training": 1,
+            "support": 3,
+            "build_config": 4,
+            "review_testing": 2,
+        },
+    },
+    "complex_reporting": {
+        "module": "bre",
+        "requires": "bre_include",
+        "hours": {
+            "module_training": 2,
+            "support": 6,
+            "build_config": 6,
+            "review_testing": 6,
+        },
+    },
+    "housing": {
+        "module": "bre",
+        "requires": "bre_include",
+        "hours": {
+            "module_training": 1,
+            "support": 3,
+            "build_config": 4,
+            "review_testing": 2,
+            "prepost_meetings": 1,
+        },
+    },
+    "table_seating": {
+        "module": "bre",
+        "requires": "bre_include",
+        "hours": {
+            "module_training": 1,
+            "support": 3,
+            "build_config": 4,
+            "review_testing": 2,
+            "prepost_meetings": 1,
+        },
+    },
+    "lookup_integration": {
+        "module": "bre",
+        "requires": "bre_include",
+        "hours": {
+            "support": 2,
+            "build_config": 2,
+            "review_testing": 2,
+        },
+    },
+
+    # --- Mobile App (APP) ---
+    "app_include": {
+        "module": "app",
+        "requires": None,
+        "hours": {
+            "kickoff_wrapup": 2,
+            "module_training": 1,
+            "support": 1,
+            "review_testing": 1,
+        },
+    },
+    "hybrid_virtual": {
+        "module": "app",
+        "requires": "app_include",
+        "hours": {
+            "module_training": 2,
+            "support": 4,
+            "build_config": 4,
+            "review_testing": 4,
+            "prepost_meetings": 2,
+        },
+    },
+    "multi_event": {
+        "module": "app",
+        "requires": "app_include",
+        "hours": {
+            "build_config": 1,
+            "review_testing": 1,
+        },
+    },
+    "CEUs": {
+        "module": "app",
+        "requires": "app_include",
+        "hours": {
+            "support": 2,
+            "build_config": 2,
+            "review_testing": 2,
+            "prepost_meetings": 1,
+        },
+    },
+    "sponsor_branding": {
+        "module": "app",
+        "requires": "app_include",
+        "hours": {
+            "support": 2,
+            "build_config": 2,
+            "review_testing": 2,
+        },
+    },
+    "leads": {
+        "module": "app",
+        "requires": "app_include",
+        "hours": {
+            "module_training": 1,
+            "prepost_meetings": 1,
+        },
+    },
+}
+
+MODULE_LABELS: Dict[str, str] = {
+    "bre": "Attendee Registration",
+    "app": "Mobile App (Connect) and Connect Online",
+}
+
+def _add_hours(target: Dict[str, float], key: str, amount: float) -> None:
+    if not amount:
+        return
+    target[key] = float(target.get(key, 0)) + float(amount)
+
 @app.post("/calculate")
 def calculate_classification(features: ProjectFeatures):
+    per_module_buckets: Dict[str, Dict[str, float]] = {
+        module_key: {k: 0.0 for k in JUSTIFICATIONS.keys()} for module_key in MODULE_LABELS.keys()
+    }
+
+    for feature_name, rule in FEATURE_RULES.items():
+        if not getattr(features, feature_name, False):
+            continue
+
+        requires = rule.get("requires")
+        if requires and not getattr(features, requires, False):
+            continue
+
+        module_key = rule["module"]
+        hours_map: Dict[str, float] = rule.get("hours", {})
+        for bucket_key, amount in hours_map.items():
+            _add_hours(per_module_buckets[module_key], bucket_key, amount)
+
+    bre_hours = 0
+    if getattr(features, "bre_include", False):
+        bre_hours = sum(per_module_buckets["bre"].values())
+    else:
+        per_module_buckets["bre"] = {k: 0.0 for k in JUSTIFICATIONS.keys()}
+
+    app_hours = 0
+    if getattr(features, "app_include", False):
+        app_hours = sum(per_module_buckets["app"].values())
+    else:
+        per_module_buckets["app"] = {k: 0.0 for k in JUSTIFICATIONS.keys()}
+
+    # Legacy scoring system for modules not yet migrated to hour breakdown
     BRE_SCORE = 0
     APP_SCORE = 0
     ABS_SCORE = 0
@@ -101,49 +331,6 @@ def calculate_classification(features: ProjectFeatures):
     PM_SCORE = 0
 
     active_keys = set()
-
-    ## ATTENDEE REGISTRATION
-    if features.workflows:
-        BRE_SCORE += 0.5
-        active_keys.update(["A", "B", "C"])
-    if features.field_logic:
-        BRE_SCORE += 2
-        active_keys.update(["A", "B", "C"])
-    if features.product_logic:
-        BRE_SCORE += 2
-        active_keys.update(["A", "B", "C"])
-    if features.session_logic:
-        BRE_SCORE += 2
-        active_keys.update(["A", "B", "C"])
-    if features.complex_reporting:
-        BRE_SCORE += 3
-        active_keys.update(["A", "B", "C"])
-    if features.housing:
-        BRE_SCORE += 2
-        active_keys.update(["B", "C"])
-    if features.table_seating:
-        BRE_SCORE += 2
-        active_keys.update(["B", "C"])
-    if features.lookup_integration:
-        BRE_SCORE += 0.5
-        active_keys.update(["A", "C"])
-
-    ## APP and CO
-    if features.hybrid_virtual:
-        APP_SCORE += 3
-        active_keys.update(["A", "B", "C"])
-    if features.multi_event:
-        APP_SCORE += 0.5
-        active_keys.update(["B"])
-    if features.CEUs:
-        APP_SCORE += 3
-        active_keys.update(["A"])
-    if features.sponsor_branding:
-        APP_SCORE += 1
-        active_keys.update(["A", "B"])
-    if features.leads:
-        APP_SCORE += 0.5
-        active_keys.update(["B"])
 
     ## ABSTRACT
     if features.complex_workflows:
@@ -214,106 +401,63 @@ def calculate_classification(features: ProjectFeatures):
         PM_SCORE += 1
         active_keys.update(["A"])
 
-    if not features.bre_include:
-        bre_hours = 0
-        BRE_result = "N/A"
-    else:
-        if BRE_SCORE < 1:
-            BRE_result = "Low"
-            bre_hours = 10
-        elif BRE_SCORE <= 5:
-            BRE_result = "Medium"
-            bre_hours = 25
-        elif BRE_SCORE <= 7:
-            BRE_result = "High"
-            bre_hours = 50
-        else:
-            BRE_result = "Extreme"
-            bre_hours = 100
-
-    if not features.app_include:
-        app_hours = 0
-        APP_result = "N/A"
-    else:
-        if APP_SCORE < 1:
-            APP_result = "Low"
-            app_hours = 5
-        elif APP_SCORE <= 3:
-            APP_result = "Medium"
-            app_hours = 10
-        elif APP_SCORE <= 6:
-            APP_result = "High"
-            app_hours = 25
-        else:
-            APP_result = "Extreme"
-            app_hours = 50
+    BRE_result = ""
+    APP_result = ""
 
     if not features.abs_include:
         abs_hours = 0
-        ABS_result = "N/A"
+        ABS_result = ""
     else:
+        ABS_result = ""
         if ABS_SCORE <= 0:
-            ABS_result = "Low"
             abs_hours = 5
         elif ABS_SCORE <= 1:
-            ABS_result = "Medium"
             abs_hours = 10
         elif ABS_SCORE <= 2:
-            ABS_result = "High"
             abs_hours = 15
         else:
-            ABS_result = "Extreme"
             abs_hours = 30
 
     if not features.exh_include:
         exh_hours = 0
-        EXH_result = "N/A"
+        EXH_result = ""
     else:
+        EXH_result = ""
         if EXH_SCORE <= 0:
-            EXH_result = "Low"
             exh_hours = 5
         elif EXH_SCORE <= 1:
-            EXH_result = "Medium"
             exh_hours = 10
         elif EXH_SCORE <= 2:
-            EXH_result = "High"
             exh_hours = 20
         else:
-            EXH_result = "Extreme"
             exh_hours = 40
 
     if not features.appointments_include:
         appointments_hours = 0
-        APPOINTMENTS_result = "N/A"
+        APPOINTMENTS_result = ""
     else:
+        APPOINTMENTS_result = ""
         if APPOINTMENTS_SCORE <= 0:
-            APPOINTMENTS_result = "Low"
             appointments_hours = 5
         elif APPOINTMENTS_SCORE <= 1:
-            APPOINTMENTS_result = "Medium"
             appointments_hours = 10
         elif APPOINTMENTS_SCORE <= 2:
-            APPOINTMENTS_result = "High"
             appointments_hours = 25
         else:
-            APPOINTMENTS_result = "Extreme"
             appointments_hours = 50
 
     if not features.kiosk_include:
         kiosk_hours = 0
-        KIOSK_result = "N/A"
+        KIOSK_result = ""
     else:
+        KIOSK_result = ""
         if KIOSK_SCORE <= 0:
-            KIOSK_result = "Low"
             kiosk_hours = 5
         elif KIOSK_SCORE <= 1:
-            KIOSK_result = "Medium"
             kiosk_hours = 10
         elif KIOSK_SCORE <= 2:
-            KIOSK_result = "High"
             kiosk_hours = 15
         else:
-            KIOSK_result = "Extreme"
             kiosk_hours = 30
 
     if CUSTOM_SCORE + PM_SCORE == 0:
@@ -321,34 +465,60 @@ def calculate_classification(features: ProjectFeatures):
         additional_result = "None"
     elif CUSTOM_SCORE + PM_SCORE <= 2:
         additional_hours = 15
-        additional_result = "Medium"
+        additional_result = ""
     elif CUSTOM_SCORE + PM_SCORE <= 4:
         additional_hours = 20
-        additional_result = "High"
+        additional_result = ""
     else:
         additional_hours = 30
-        additional_result = "Extreme"
+        additional_result = ""
 
     total_hours = bre_hours + app_hours + abs_hours + exh_hours + appointments_hours + kiosk_hours + additional_hours
     final_reasons = [DESCRIPTIONS[k] for k in sorted(active_keys)]
 
     return {
         "bre_score": bre_hours,
-        "bre_classification": BRE_result,
+        "bre_classification":"",
         "app_score": app_hours,
-        "app_classification": APP_result,
+        "app_classification": "",
         "abs_score": abs_hours,
-        "abs_classification": ABS_result,
+        "abs_classification": "",
         "exh_score": exh_hours,
-        "exh_classification": EXH_result,
+        "exh_classification": "",
         "appointments_score": appointments_hours,
-        "appointments_classification": APPOINTMENTS_result,
+        "appointments_classification": "",
         "kiosk_score": kiosk_hours,
-        "kiosk_classification": KIOSK_result,
+        "kiosk_classification": "",
         "additional_hours": additional_hours,
-        "additional_classification": additional_result,
+        "additional_classification": "",
         "total_hours": total_hours,
-        "reasons": final_reasons
+        "reasons": final_reasons,
+        "module_breakdowns": {
+            module_key: {
+                "key": module_key,
+                "label": MODULE_LABELS[module_key],
+                "total_hours": int(sum(per_module_buckets[module_key].values())),
+                "items": [
+                    {
+                        "key": bucket_key,
+                        "label": JUSTIFICATIONS[bucket_key],
+                        "hours": int(per_module_buckets[module_key].get(bucket_key, 0)),
+                    }
+                    for bucket_key in JUSTIFICATIONS.keys()
+                    if per_module_buckets[module_key].get(bucket_key, 0) and per_module_buckets[module_key].get(bucket_key, 0) > 0
+                ],
+            }
+            for module_key in MODULE_LABELS.keys()
+        },
+        "justifications": [
+            {
+                "key": bucket_key,
+                "label": JUSTIFICATIONS[bucket_key],
+                "hours": int(per_module_buckets["bre"].get(bucket_key, 0) + per_module_buckets["app"].get(bucket_key, 0)),
+            }
+            for bucket_key in JUSTIFICATIONS.keys()
+            if (per_module_buckets["bre"].get(bucket_key, 0) + per_module_buckets["app"].get(bucket_key, 0)) > 0
+        ],
     }
 
 FEATURE_LABELS: Dict[str, str] = {
@@ -419,15 +589,24 @@ MODULE_GROUPS: Dict[str, List[str]] = {
 }
 
 def _smtp_send_pdf(to_email: str, subject: str, body_text: str, pdf_bytes: bytes, filename: str) -> None:
-    host = os.getenv("SMTP_HOST", "")
-    port = int(os.getenv("SMTP_PORT", "587"))
-    username = os.getenv("SMTP_USERNAME", "")
-    password = os.getenv("SMTP_PASSWORD", "")
-    from_addr = os.getenv("SMTP_FROM", username or "no-reply@example.com")
-    use_tls = os.getenv("SMTP_USE_TLS", "true").lower() in ("1", "true", "yes", "y")
+    host = SMTP_HOST
+    port = int(SMTP_PORT)
+    username = SMTP_USERNAME
+    password = SMTP_PASSWORD
+    from_addr = SMTP_FROM or username
+    use_tls = SMTP_USE_TLS
+
+    if isinstance(use_tls, str):
+        use_tls = use_tls.lower() in ("1", "true", "yes", "y")
 
     if not host:
-        raise RuntimeError("SMTP_HOST is not configured")
+        raise RuntimeError("SMTP_HOST is not configured (check env.py)")
+
+    if not from_addr:
+        raise RuntimeError("SMTP_FROM is not configured (check env.py)")
+
+    if isinstance(password, str):
+        password = password.replace(" ", "").strip()
 
     msg = EmailMessage()
     msg["Subject"] = subject
@@ -436,11 +615,14 @@ def _smtp_send_pdf(to_email: str, subject: str, body_text: str, pdf_bytes: bytes
     msg.set_content(body_text)
     msg.add_attachment(pdf_bytes, maintype="application", subtype="pdf", filename=filename)
 
-    with smtplib.SMTP(host, port) as server:
+    with smtplib.SMTP(host, port, timeout=20) as server:
+        server.ehlo()
         if use_tls:
             server.starttls()
+            server.ehlo()
         if username and password:
             server.login(username, password)
+
         server.send_message(msg)
 
 def _build_print_html(customer_name: str, selected_by_module: Dict[str, List[str]], calc: Dict[str, Any]) -> str:
@@ -500,13 +682,13 @@ def _build_print_html(customer_name: str, selected_by_module: Dict[str, List[str
             </div>
 
             <aside class="result-card">
-            <div class="row">Attendee Registration: {calc.get('bre_classification','')} — {calc.get('bre_score',0)} hrs</div>
-            <div class="row">APP and CO: {calc.get('app_classification','')} — {calc.get('app_score',0)} hrs</div>
-            <div class="row">Abstract: {calc.get('abs_classification','')} — {calc.get('abs_score',0)} hrs</div>
-            <div class="row">Exhibits: {calc.get('exh_classification','')} — {calc.get('exh_score',0)} hrs</div>
-            <div class="row">Appointments: {calc.get('appointments_classification','')} — {calc.get('appointments_score',0)} hrs</div>
-            <div class="row">Kiosk / Badges: {calc.get('kiosk_classification','')} — {calc.get('kiosk_score',0)} hrs</div>
-            <div class="row">Custom / PM: {calc.get('additional_classification','')} — {calc.get('additional_hours',0)} hrs</div>
+            <div class="row">Attendee Registration — {calc.get('bre_score',0)} hrs</div>
+            <div class="row">APP and CO — {calc.get('app_score',0)} hrs</div>
+            <div class="row">Abstract — {calc.get('abs_score',0)} hrs</div>
+            <div class="row">Exhibits — {calc.get('exh_score',0)} hrs</div>
+            <div class="row">Appointments — {calc.get('appointments_score',0)} hrs</div>
+            <div class="row">Kiosk / Badges — {calc.get('kiosk_score',0)} hrs</div>
+            <div class="row">Custom / PM — {calc.get('additional_hours',0)} hrs</div>
 
             {scope_lines}
 
@@ -518,16 +700,86 @@ def _build_print_html(customer_name: str, selected_by_module: Dict[str, List[str
     """
 
 async def _html_to_pdf_bytes(html: str) -> bytes:
-    async with async_playwright() as p:
-        browser = await p.chromium.launch()
-        page = await browser.new_page()
-        await page.set_content(html, wait_until="load")
-        pdf = await page.pdf(format="Letter", print_background=True)
-        await browser.close()
-        return pdf
+    def _format_exc(e: Exception) -> str:
+        msg = str(e).strip()
+        if msg:
+            return msg
+        return repr(e)
+
+    def _render_pdf_sync(html_content: str) -> bytes:
+        # Using Playwright sync API avoids relying on the server's asyncio event loop
+        # (which can be configured to a Windows selector loop and raise NotImplementedError).
+        from playwright.sync_api import sync_playwright
+
+        with sync_playwright() as p:
+            browser = p.chromium.launch()
+            try:
+                page = browser.new_page()
+                page.set_content(html_content, wait_until="load")
+                return page.pdf(format="Letter", print_background=True)
+            finally:
+                browser.close()
+
+    try:
+        return await asyncio.to_thread(_render_pdf_sync, html)
+    except ModuleNotFoundError as e:
+        raise RuntimeError(
+            "Playwright is not installed in the active Python environment. "
+            "Install it with: python -m pip install playwright && python -m playwright install chromium"
+        ) from e
+    except Exception as e:
+        msg = _format_exc(e)
+        if "executable" in msg.lower() and ("doesn't exist" in msg.lower() or "does not exist" in msg.lower()):
+            raise RuntimeError(
+                "Playwright Chromium browser binaries are not installed. "
+                "Run this once in your venv: python -m playwright install chromium. "
+                f"Original error: {msg}"
+            ) from e
+        raise
 
 @app.post("/email")
 async def email_endpoint(req: EmailRequest):
+    customer = (req.customer_name or "").strip()
+    if len(customer) < 2:
+        raise HTTPException(status_code=400, detail="Customer name is required")
+
+    to_email = (req.to_email or "").strip()
+    _, parsed_email = parseaddr(to_email)
+    if not parsed_email or "@" not in parsed_email:
+        raise HTTPException(status_code=400, detail="A valid recipient email is required")
+
+    selected_by_module: Dict[str, List[str]] = {}
+    for module_name, feature_ids in MODULE_GROUPS.items():
+        selected: List[str] = []
+        for fid in feature_ids:
+            if getattr(req.features, fid, False):
+                selected.append(FEATURE_LABELS.get(fid, fid))
+        selected_by_module[module_name] = selected
+
+    calc = calculate_classification(req.features)
+    html = _build_print_html(customer, selected_by_module, calc)
+
+    try:
+        pdf_bytes = await _html_to_pdf_bytes(html)
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"PDF generation failed ({type(e).__name__}): {e!r}",
+        )
+
+    subject = f"PSC Hours Calculator - {customer}"
+    body = f"Attached are the PSC Hours Calculator results for {customer}."
+
+    try:
+        _smtp_send_pdf(parsed_email, subject, body, pdf_bytes, f"PSC_Hours_{customer}.pdf")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Email send failed: {e}")
+
+    return {"ok": True}
+
+
+@app.post("/pdf")
+async def pdf_endpoint(req: PdfRequest):
     customer = (req.customer_name or "").strip()
     if len(customer) < 2:
         raise HTTPException(status_code=400, detail="Customer name is required")
@@ -542,14 +794,18 @@ async def email_endpoint(req: EmailRequest):
 
     calc = calculate_classification(req.features)
     html = _build_print_html(customer, selected_by_module, calc)
-    pdf_bytes = await _html_to_pdf_bytes(html)
-
-    subject = f"PSC Hours Calculator - {customer}"
-    body = f"Attached are the PSC Hours Calculator results for {customer}."
 
     try:
-        _smtp_send_pdf(req.to_email, subject, body, pdf_bytes, f"PSC_Hours_{customer}.pdf")
+        pdf_bytes = await _html_to_pdf_bytes(html)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Email send failed: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"PDF generation failed ({type(e).__name__}): {e!r}",
+        )
 
-    return {"ok": True}
+    filename = f"PSC_Hours_{customer}.pdf"
+    return Response(
+        content=pdf_bytes,
+        media_type="application/pdf",
+        headers={"Content-Disposition": f"inline; filename=\"{filename}\""},
+    )
