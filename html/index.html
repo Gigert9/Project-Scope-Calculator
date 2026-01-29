@@ -17,18 +17,6 @@
         <h1>PSC Hours Calculator</h1>
         <p>Select the features required for each module to determine the project classification.</p>
 
-        <div class="customer-bar">
-            <label class="customer-field">
-                Customer Name <span class="required">*</span>
-                <input id="customer-name" type="text" required minlength="2" placeholder="Enter customer name" autocomplete="organization">
-            </label>
-
-            <label class="customer-field">
-                Email To (optional)
-                <input id="recipient-email" type="email" placeholder="name@company.com" autocomplete="email">
-            </label>
-        </div>
-
         <div class="print-only" id="print-header" style="display: none;">
             <div class="print-header-row">
                 <div class="print-title">PSC Hours Calculator</div>
@@ -42,6 +30,13 @@
         <div id="calculator-form">
             <div class="main-layout">
                 <div class="form-sections">
+                    <section class="module customer-module">
+                        <label class="customer-field">
+                            <span class="field-label">Customer Name <span class="required">*</span></span>
+                            <input id="customer-name" type="text" required minlength="2" placeholder="Enter customer name" autocomplete="organization">
+                        </label>
+                    </section>
+
                     <section class="module">
                         <h2>Attendee Registration</h2>
                         <label class="feature base-toggle">

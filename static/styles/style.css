@@ -140,18 +140,9 @@ input[type="checkbox"] {
     opacity: 0.9;
 }
 
-/* NEW: Customer bar */
-.customer-bar {
-    display: flex;
-    gap: 1rem;
-    align-items: flex-end;
-    justify-content: space-between;
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 1rem;
-    margin: 1rem 0 1.25rem 0;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+.customer-module {
+    margin-top: 1rem;
+    margin-bottom: 1.25rem;
 }
 
 .customer-field {
@@ -159,7 +150,12 @@ input[type="checkbox"] {
     flex-direction: column;
     gap: 0.35rem;
     font-size: 0.9rem;
-    flex: 1;
+}
+
+.field-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
 }
 
 .customer-field input {
@@ -183,7 +179,6 @@ input[type="checkbox"] {
     min-height: 1.2em;
 }
 
-/* NEW: Print-only header */
 .print-only {
     display: none;
 }
@@ -214,7 +209,7 @@ input[type="checkbox"] {
 }
 
 @media print {
-    .button-group, .print-btn, .reset-btn, .email-btn, .logo-wrapper, input[type="checkbox"], .customer-bar, #email-status {
+    .button-group, .print-btn, .reset-btn, .email-btn, .logo-wrapper, input[type="checkbox"], .customer-module, #email-status {
         display: none !important;
     }
 
@@ -293,10 +288,6 @@ input[type="checkbox"] {
         width: 100%;
     }
 
-    .customer-bar {
-        flex-direction: column;
-        align-items: stretch;
-    }
 }
 
 #reasons-list li {
@@ -304,7 +295,6 @@ input[type="checkbox"] {
     line-height: 1.3;
 }
 
-/* JS adds this class to show per-module breakdown items */
 #reasons-list li.sub-item {
     margin-left: 14px;
     list-style-type: circle;
