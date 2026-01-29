@@ -3,11 +3,13 @@ const isChecked = (id) => {
     return el ? el.checked : false;
 };
 
-async function updateClassification() {
-    // console.log("Updating classification..."); // Debug log
+const getValue = (id) => {
+    const el = document.getElementById(id);
+    return el ? el.value : '';
+};
 
-    const projectData = {
-        // Module Toggles
+function buildProjectData() {
+    return {
         bre_include: isChecked('bre_include'),
         app_include: isChecked('app_include'),
         abs_include: isChecked('abs_include'),
@@ -15,8 +17,7 @@ async function updateClassification() {
         appointments_include: isChecked('appointments_include'),
         kiosk_include: isChecked('kiosk_include'),
 
-        // Sub-features
-        workflows: isChecked('workflows'), 
+        workflows: isChecked('workflows'),
         field_logic: isChecked('field_logic'),
         product_logic: isChecked('product_logic'),
         session_logic: isChecked('session_logic'),
@@ -24,36 +25,77 @@ async function updateClassification() {
         housing: isChecked('housing'),
         table_seating: isChecked('table_seating'),
         lookup_integration: isChecked('lookup_integration'),
+
         hybrid_virtual: isChecked('hybrid_virtual'),
         multi_event: isChecked('multi_event'),
         CEUs: isChecked('CEUs'),
         sponsor_branding: isChecked('sponsor_branding'),
         leads: isChecked('leads'),
+
         complex_workflows: isChecked('complex_workflows'),
         multiple_review_rounds: isChecked('multiple_review_rounds'),
         multiple_proposal_calls: isChecked('multiple_proposal_calls'),
+
         floor_plan: isChecked('floor_plan'),
         year_round: isChecked('year_round'),
         complex_sponsors: isChecked('complex_sponsors'),
+
         multi_scheduling: isChecked('multi_scheduling'),
         first_time_system: isChecked('first_time_system'),
         matchmaking: isChecked('matchmaking'),
+
         personal_agenda: isChecked('personal_agenda'),
         double_sided: isChecked('double_sided'),
         logic_based_badges: isChecked('logic_based_badges'),
         multi_badge_types: isChecked('multi_badge_types'),
         customer_hardware: isChecked('customer_hardware'),
+
         integrations: isChecked('integrations'),
         SSO: isChecked('SSO'),
+
         multiple_POCs: isChecked('multiple_POCs'),
         recurring_calls: isChecked('recurring_calls'),
         more_than_8_events: isChecked('more_than_8_events')
     };
+}
+
+function syncPrintHeader() {
+    const name = (getValue('customer-name') || '').trim();
+    const namePrint = document.getElementById('customer-name-print');
+    if (namePrint) namePrint.textContent = name;
+
+    const dateEl = document.getElementById('print-date');
+    if (dateEl) {
+        const now = new Date();
+        dateEl.textContent = now.toLocaleString();
+    }
+}
+
+function requireCustomerName() {
+    const input = document.getElementById('customer-name');
+    if (!input) return true;
+
+    // Uses native browser validation UI
+    if (!input.checkValidity()) {
+        input.reportValidity();
+        input.focus();
+        return false;
+    }
+    return true;
+}
+
+function setEmailStatus(text) {
+    const el = document.getElementById('email-status');
+    if (el) el.textContent = text || '';
+}
+
+async function updateClassification() {
+    const projectData = buildProjectData();
 
     try {
         const response = await fetch('/calculate', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' }, 
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(projectData),
         });
 
@@ -62,11 +104,21 @@ async function updateClassification() {
 
         const reasonsContainer = document.getElementById('reasons-container');
         const reasonsList = document.getElementById('reasons-list');
-        reasonsList.innerHTML = '';
+        if (reasonsList) reasonsList.innerHTML = '';
 
-        if (result.reasons && result.reasons.length > 0) {
+        // Supports either `result.justifications` (new) or `result.reasons` (legacy strings)
+        const breakdown = result.justifications || null;
+
+        if (breakdown && Array.isArray(breakdown) && breakdown.length > 0) {
             reasonsContainer.style.display = 'block';
-            
+
+            breakdown.forEach(item => {
+                const li = document.createElement('li');
+                li.textContent = `${item.label}: ${item.hours} hour${item.hours === 1 ? '' : 's'}`;
+                reasonsList.appendChild(li);
+            });
+        } else if (result.reasons && result.reasons.length > 0) {
+            reasonsContainer.style.display = 'block';
             result.reasons.forEach(reason => {
                 const li = document.createElement('li');
                 li.textContent = reason;
@@ -96,7 +148,7 @@ async function updateClassification() {
         updateModuleUI('appointments', 'Appointments', result.appointments_score, result.appointments_classification);
         updateModuleUI('kiosk', 'Kiosk / Badges', result.kiosk_score, result.kiosk_classification);
         updateModuleUI('additional', 'Custom / PM', result.additional_hours, result.additional_classification);
-        
+
         document.getElementById('total-hours').innerText = `Total PSC Hours: ${result.total_hours}`;
     } catch (error) {
         console.error('Error:', error);
@@ -119,6 +171,40 @@ function toggleModule(includeCheckboxId, targetContainerId) {
     updateClassification();
 }
 
+async function emailResults() {
+    if (!requireCustomerName()) return;
+
+    const toEmail = (getValue('recipient-email') || '').trim() || prompt('Send results to what email address?');
+    if (!toEmail) return;
+
+    setEmailStatus('Sending email…');
+
+    const payload = {
+        to_email: toEmail,
+        customer_name: (getValue('customer-name') || '').trim(),
+        features: buildProjectData()
+    };
+
+    try {
+        const response = await fetch('/email', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+        });
+
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) {
+            throw new Error(data.detail || 'Email failed');
+        }
+
+        setEmailStatus('Email sent.');
+        setTimeout(() => setEmailStatus(''), 4000);
+    } catch (err) {
+        console.error(err);
+        setEmailStatus(`Email error: ${err.message || err}`);
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
         checkbox.addEventListener('change', updateClassification);
@@ -135,23 +221,43 @@ document.addEventListener('DOMContentLoaded', () => {
 
     moduleToggles.forEach(t => {
         const el = document.getElementById(t.check);
-        if (el) {
-            el.addEventListener('change', () => toggleModule(t.check, t.feat));
-        }
+        if (el) el.addEventListener('change', () => toggleModule(t.check, t.feat));
     });
+
+    const nameInput = document.getElementById('customer-name');
+    if (nameInput) nameInput.addEventListener('input', syncPrintHeader);
+    syncPrintHeader();
+
+    const printBtn = document.getElementById('print-btn');
+    if (printBtn) {
+        printBtn.addEventListener('click', () => {
+            if (!requireCustomerName()) return;
+            syncPrintHeader();
+            window.print();
+        });
+    }
+
+    const emailBtn = document.getElementById('email-btn');
+    if (emailBtn) emailBtn.addEventListener('click', emailResults);
 
     document.getElementById('reset-btn').addEventListener('click', () => {
         document.querySelectorAll('input[type="checkbox"]').forEach(box => box.checked = false);
         document.querySelectorAll('[id$="-features"]').forEach(span => span.style.display = 'none');
 
-        document.getElementById('reasons-container').style.display = 'none';                                                                                                                                                
+        document.getElementById('reasons-container').style.display = 'none';
         document.getElementById('reasons-list').innerHTML = '';
-        
+
         const sections = ['bre', 'app', 'abs', 'exh', 'appointments', 'kiosk', 'additional'];
         sections.forEach(s => {
             document.getElementById(`${s}-classification`).innerText = s === 'bre' ? "Waiting for selection..." : "";
             document.getElementById(`${s}-score`).innerText = "";
         });
+
         document.getElementById('total-hours').innerText = '';
+        setEmailStatus('');
+        if (nameInput) nameInput.value = '';
+        const emailInput = document.getElementById('recipient-email');
+        if (emailInput) emailInput.value = '';
+        syncPrintHeader();
     });
 });

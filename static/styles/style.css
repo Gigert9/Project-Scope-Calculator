@@ -121,9 +121,10 @@ input[type="checkbox"] {
     display: flex;
     gap: 1rem;
     margin-top: 1rem;
+    flex-wrap: wrap;
 }
 
-.print-btn, .reset-btn {
+.print-btn, .reset-btn, .email-btn {
     flex: 1;
     padding: 12px;
     border-radius: 6px;
@@ -131,24 +132,87 @@ input[type="checkbox"] {
     cursor: pointer;
     border: none;
     transition: opacity 0.2s;
-}
-
-.print-btn {
     background-color: #e2e8f0;
     color: var(--text);
 }
 
-.reset-btn {
-    background-color: #e2e8f0;
-    color: var(--text);
-}
-
-.print-btn:hover, .reset-btn:hover {
+.print-btn:hover, .reset-btn:hover, .email-btn:hover {
     opacity: 0.9;
 }
 
+/* NEW: Customer bar */
+.customer-bar {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-end;
+    justify-content: space-between;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem;
+    margin: 1rem 0 1.25rem 0;
+}
+
+.customer-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    font-size: 0.9rem;
+    flex: 1;
+}
+
+.customer-field input {
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 0.95rem;
+}
+
+.required {
+    color: #b91c1c;
+    font-weight: 700;
+    margin-left: 0.25rem;
+}
+
+.status-line {
+    margin-top: 0.75rem;
+    font-size: 0.9rem;
+    color: #334155;
+    min-height: 1.2em;
+}
+
+/* NEW: Print-only header */
+.print-only {
+    display: none;
+}
+
+.print-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 1rem;
+}
+
+.print-title {
+    font-size: 14pt;
+    font-weight: 700;
+    color: #111827;
+}
+
+.print-meta {
+    font-size: 10pt;
+    color: #374151;
+}
+
+.print-customer {
+    margin-top: 6px;
+    font-size: 11pt;
+    font-weight: 600;
+    color: #111827;
+}
+
 @media print {
-    .button-group, .print-btn, .reset-btn, .logo-wrapper, input[type="checkbox"] {
+    .button-group, .print-btn, .reset-btn, .email-btn, .logo-wrapper, input[type="checkbox"], .customer-bar, #email-status {
         display: none !important;
     }
 
@@ -157,6 +221,13 @@ input[type="checkbox"] {
         margin: 0;
         padding: 0;
         background: white;
+    }
+
+    .print-only {
+        display: block !important;
+        border-bottom: 2px solid #e5e7eb;
+        padding-bottom: 10px;
+        margin-bottom: 16px;
     }
 
     .feature {
@@ -182,7 +253,7 @@ input[type="checkbox"] {
 
     .result-card {
         display: block !important;
-        border: 2px slid #333;
+        border: 2px solid #333;
         padding: 20px;
         margin-top: 20px;
     }
@@ -200,7 +271,7 @@ input[type="checkbox"] {
         display: block !important;
         border-top: 1px solid #333 !important;
     }
-    
+
     #reasons-list {
         color: black !important;
     }
@@ -214,6 +285,11 @@ input[type="checkbox"] {
     .sidebar {
         position: static;
         width: 100%;
+    }
+
+    .customer-bar {
+        flex-direction: column;
+        align-items: stretch;
     }
 }
 
