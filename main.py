@@ -58,30 +58,31 @@ class ProjectFeatures(BaseModel):
     housing: bool = False
     table_seating: bool = False
     lookup_integration: bool = False
+
     hybrid_virtual: bool = False
     multi_event: bool = False
     CEUs: bool = False
     sponsor_branding: bool = False
     leads: bool = False
+
     complex_workflows: bool = False
     multiple_review_rounds: bool = False
     multiple_proposal_calls: bool = False
+
     floor_plan: bool = False
     year_round: bool = False
     complex_sponsors: bool = False
+
     multi_scheduling: bool = False
     first_time_system: bool = False
     matchmaking: bool = False
+
     personal_agenda: bool = False
     double_sided: bool = False
     logic_based_badges: bool = False
     multi_badge_types: bool = False
     customer_hardware: bool = False
-    integrations: bool = False
-    SSO: bool = False
-    multiple_POCs: bool = False
-    recurring_calls: bool = False
-    more_than_8_events: bool = False
+
     bre_include: bool = False
     app_include: bool = False
     abs_include: bool = False
@@ -109,11 +110,11 @@ def index():
 def health():
     return {"ok": True}
 
-DESCRIPTIONS = {
-    "A": "Additional kick off call / follow ups and questions",
-    "B": "Additional training",
-    "C": "Review and testing work"
-}
+DISCLAIMER_TEXT = (
+    "Disclaimer: Additional hours (not included) will be required for any new dev work, custom work,"
+    "integrations/SSO, multiple POCs/Divisions, and for multi event customers or those with committed weekly calls, as well as customers"
+    "with more than 8 events a year."
+)
 
 JUSTIFICATIONS: Dict[str, str] = {
     "kickoff_wrapup": "Kick Off and Wrap Up calls",
@@ -147,7 +148,6 @@ FEATURE_RULES: Dict[str, Dict[str, Any]] = {
             "review_testing": 2,
         },
     },
-
     "field_logic": {
         "module": "bre",
         "requires": "bre_include",
@@ -277,11 +277,206 @@ FEATURE_RULES: Dict[str, Dict[str, Any]] = {
             "prepost_meetings": 1,
         },
     },
+
+    #--- Appointments ---
+    "appointments_include": {
+        "module": "appointments",
+        "requires": None,
+        "hours": {
+            "kickoff_wrapup": 2,
+            "module_training": 1,
+            "support": 1,
+            "review_testing": 1,
+        },
+    },
+    "multi_scheduling": {
+        "module": "appointments",
+        "requires": "appointments_include",
+        "hours": {
+            "module_training": 2,
+            "support": 2,
+            "build_config": 2,
+            "review_testing": 2,
+            "prepost_meetings": 2,
+        },
+    },
+    "first_time_system": {
+        "module": "appointments",
+        "requires": "appointments_include",
+        "hours": {
+            "module_training": 2,
+            "support": 3,
+            "build_config": 2,
+            "review_testing": 2,
+            "prepost_meetings": 2,
+        },
+    },
+    "matchmaking": {
+        "module": "appointments",
+        "requires": "appointments_include",
+        "hours": {
+            "module_training": 4,
+            "support": 2,
+            "build_config": 6,
+            "review_testing": 6,
+            "prepost_meetings": 4,
+        },
+    },
+
+    #--- Abstract ---
+    "abs_include": {
+        "module": "abs",
+        "requires": None,
+        "hours": {
+            "kickoff_wrapup": 2,
+            "module_training": 2,
+            "prepost_meetings": 1,
+        },
+    },
+    "complex_workflows": {
+        "module": "abs",
+        "requires": "abs_include",
+        "hours": {
+            "module_training": 2,
+            "support": 2, 
+            "build_config": 1,
+            "review_testing": 1,
+            "prepost_meetings": 2,
+        },
+    },
+    "multiple_review_rounds": {
+        "module": "abs",
+        "requires": "abs_include",
+        "hours": {
+            "module_training": 3,
+            "support": 4,
+            "build_config": 2,
+            "review_testing": 1,
+            "prepost_meetings": 2
+        },
+    },
+    "multiple_proposal_calls": {
+        "module": "abs",
+        "requires": "abs_include",
+        "hours": {
+            "support": 1,
+            "build_config": 1,
+            "prepost_meetings": 1,
+        },
+    },
+
+    #--- Exhibitor Registration ---
+    "exh_include": {
+        "module": "exh",
+        "requires": None,
+        "hours": {
+            "kickoff_wrapup": 1,
+            "module_training": 1,
+            "support": 1,
+            "build_config": 1,
+            "review_testing": 1,
+            "prepost_meetings": 1,
+        },
+    },
+    "floor_plan": {
+        "module": "exh",
+        "requires": "exh_include",
+        "hours": {
+            "module_training": 1,
+            "support": 1,
+            "build_config": 2,
+            "review_testing": 1,
+        },
+    },
+    "year_round": {
+        "module": "exh",
+        "requires": "exh_include",
+        "hours": {
+            "module_training": 2,
+            "support": 4,
+            "build_config": 3,
+            "review_testing": 2,
+            "prepost_meetings": 4,
+        },
+    },
+    "complex_sponsors": {
+        "module": "exh",
+        "requires": "exh_include",
+        "hours": {
+            "module_training": 1,
+            "support": 4,
+            "build_config": 4,
+            "review_testing": 3,
+            "prepost_meetings": 2,
+        },
+    },
+
+    #--- Kiosk/Badges ---
+    "kiosk_include": {
+        "module": "kiosk",
+        "requires": None,
+        "hours": {
+            "module_training": 1,
+            "support": 1,
+            "build_config": 1,
+            "review_testing": 1,
+            "prepost_meetings": 1,
+        },
+    },
+    "personal_agenda": {
+        "module": "kiosk",
+        "requires": "kiosk_include",
+        "hours": {
+            "support": 1,
+            "build_config": 2,
+            "review_testing": 2,
+        },
+    },
+    "double_sided": {
+        "module": "kiosk",
+        "requires": "kiosk_include",
+        "hours": {
+            "support": 1,
+            "build_config": 1,
+            "review_testing": 1,
+        },
+    },
+    "logic_based_badges": {
+        "module": "kiosk",
+        "requires": "kiosk_include",
+        "hours": {
+            "support": 1,
+            "build_config": 2,
+            "review_testing": 8,
+        },
+    },
+    "multi_badge_types": {
+        "module": "kiosk",
+        "requires": "kiosk_include",
+        "hours": {
+            "support": 1,
+            "build_config": 1,
+            "review_testing": 1,
+        },
+    },
+    "customer_hardware": {
+        "module": "kiosk",
+        "requires": "kiosk_include",
+        "hours": {
+            "module_training": 1,
+            "support": 1,
+            "review_testing": 1,
+        },
+    },
 }
 
 MODULE_LABELS: Dict[str, str] = {
     "bre": "Attendee Registration",
     "app": "Mobile App (Connect) and Connect Online",
+    "appointments": "Appointments",
+    "abs": "Abstract / Speaker Management",
+    "exh": "Exhibitor Registration / Booth Selection",
+    "kiosk": "Kiosk / Badge Printing",
 }
 
 def _add_hours(target: Dict[str, float], key: str, amount: float) -> None:
@@ -295,6 +490,7 @@ def calculate_classification(features: ProjectFeatures):
         module_key: {k: 0.0 for k in JUSTIFICATIONS.keys()} for module_key in MODULE_LABELS.keys()
     }
 
+    # Apply hour rules
     for feature_name, rule in FEATURE_RULES.items():
         if not getattr(features, feature_name, False):
             continue
@@ -308,191 +504,53 @@ def calculate_classification(features: ProjectFeatures):
         for bucket_key, amount in hours_map.items():
             _add_hours(per_module_buckets[module_key], bucket_key, amount)
 
-    bre_hours = 0
-    if getattr(features, "bre_include", False):
-        bre_hours = sum(per_module_buckets["bre"].values())
-    else:
-        per_module_buckets["bre"] = {k: 0.0 for k in JUSTIFICATIONS.keys()}
+    # Force modules off if their include toggle is off (extra safety)
+    include_by_module = {
+        "bre": "bre_include",
+        "app": "app_include",
+        "abs": "abs_include",
+        "exh": "exh_include",
+        "appointments": "appointments_include",
+        "kiosk": "kiosk_include",
+    }
+    for module_key, include_key in include_by_module.items():
+        if not getattr(features, include_key, False):
+            per_module_buckets[module_key] = {k: 0.0 for k in JUSTIFICATIONS.keys()}
 
-    app_hours = 0
-    if getattr(features, "app_include", False):
-        app_hours = sum(per_module_buckets["app"].values())
-    else:
-        per_module_buckets["app"] = {k: 0.0 for k in JUSTIFICATIONS.keys()}
+    # Totals per module
+    module_totals: Dict[str, int] = {
+        module_key: int(sum(per_module_buckets[module_key].values()))
+        for module_key in MODULE_LABELS.keys()
+    }
 
-    # Legacy scoring system for modules not yet migrated to hour breakdown
-    BRE_SCORE = 0
-    APP_SCORE = 0
-    ABS_SCORE = 0
-    EXH_SCORE = 0
-    APPOINTMENTS_SCORE = 0
-    KIOSK_SCORE = 0
-    CUSTOM_SCORE = 0
-    PM_SCORE = 0
+    # Overall total
+    total_hours = int(sum(module_totals.values()))
 
-    active_keys = set()
-
-    ## ABSTRACT
-    if features.complex_workflows:
-        ABS_SCORE += 1
-        active_keys.update(["A", "B", "C"])
-    if features.multiple_review_rounds:
-        ABS_SCORE += 1
-        active_keys.update(["A"])
-    if features.multiple_proposal_calls:
-        ABS_SCORE += 1
-        active_keys.update(["A"])
-
-    ## EXHIBITOR REGISTRATION
-    if features.floor_plan:
-        EXH_SCORE += 1
-        active_keys.update(["B", "C"])
-    if features.year_round:
-        EXH_SCORE += 1
-        active_keys.update(["A", "B", "C"])
-    if features.complex_sponsors:
-        EXH_SCORE += 1
-        active_keys.update(["B", "C"])
-
-    ## APPOINTMENTS
-    if features.multi_scheduling:
-        APPOINTMENTS_SCORE += 1
-        active_keys.update(["A", "B", "C"])
-    if features.first_time_system:
-        APPOINTMENTS_SCORE += 1
-        active_keys.update(["A", "B", "C"])
-    if features.matchmaking:
-        APPOINTMENTS_SCORE += 1
-        active_keys.update(["B", "C"])
-
-    ## KIOSK/BADGES
-    if features.personal_agenda:
-        KIOSK_SCORE += 1
-        active_keys.update(["A", "C"])
-    if features.double_sided:
-        KIOSK_SCORE += 1
-        active_keys.update(["A", "C"])
-    if features.logic_based_badges:
-        KIOSK_SCORE += 1
-        active_keys.update(["A", "B", "C"])
-    if features.multi_badge_types:
-        KIOSK_SCORE += 1
-        active_keys.update(["A", "B", "C"])
-    if features.customer_hardware:
-        KIOSK_SCORE += 1
-        active_keys.update(["A", "B", "C"])
-
-    ## CUSTOM
-    if features.integrations:
-        CUSTOM_SCORE += 1
-        active_keys.update(["A", "C"])
-    if features.SSO:
-        CUSTOM_SCORE += 1
-        active_keys.update(["A", "C"])
-
-    ## PROJECT MANAGEMENT
-    if features.multiple_POCs:
-        PM_SCORE += 1
-        active_keys.update(["A", "B"])
-    if features.recurring_calls:
-        PM_SCORE += 1
-        active_keys.update(["A"])
-    if features.more_than_8_events:
-        PM_SCORE += 1
-        active_keys.update(["A"])
-
-    BRE_result = ""
-    APP_result = ""
-
-    if not features.abs_include:
-        abs_hours = 0
-        ABS_result = ""
-    else:
-        ABS_result = ""
-        if ABS_SCORE <= 0:
-            abs_hours = 5
-        elif ABS_SCORE <= 1:
-            abs_hours = 10
-        elif ABS_SCORE <= 2:
-            abs_hours = 15
-        else:
-            abs_hours = 30
-
-    if not features.exh_include:
-        exh_hours = 0
-        EXH_result = ""
-    else:
-        EXH_result = ""
-        if EXH_SCORE <= 0:
-            exh_hours = 5
-        elif EXH_SCORE <= 1:
-            exh_hours = 10
-        elif EXH_SCORE <= 2:
-            exh_hours = 20
-        else:
-            exh_hours = 40
-
-    if not features.appointments_include:
-        appointments_hours = 0
-        APPOINTMENTS_result = ""
-    else:
-        APPOINTMENTS_result = ""
-        if APPOINTMENTS_SCORE <= 0:
-            appointments_hours = 5
-        elif APPOINTMENTS_SCORE <= 1:
-            appointments_hours = 10
-        elif APPOINTMENTS_SCORE <= 2:
-            appointments_hours = 25
-        else:
-            appointments_hours = 50
-
-    if not features.kiosk_include:
-        kiosk_hours = 0
-        KIOSK_result = ""
-    else:
-        KIOSK_result = ""
-        if KIOSK_SCORE <= 0:
-            kiosk_hours = 5
-        elif KIOSK_SCORE <= 1:
-            kiosk_hours = 10
-        elif KIOSK_SCORE <= 2:
-            kiosk_hours = 15
-        else:
-            kiosk_hours = 30
-
-    if CUSTOM_SCORE + PM_SCORE == 0:
-        additional_hours = 0
-        additional_result = "None"
-    elif CUSTOM_SCORE + PM_SCORE <= 2:
-        additional_hours = 15
-        additional_result = ""
-    elif CUSTOM_SCORE + PM_SCORE <= 4:
-        additional_hours = 20
-        additional_result = ""
-    else:
-        additional_hours = 30
-        additional_result = ""
-
-    total_hours = bre_hours + app_hours + abs_hours + exh_hours + appointments_hours + kiosk_hours + additional_hours
-    final_reasons = [DESCRIPTIONS[k] for k in sorted(active_keys)]
+    # Optional: overall scope breakdown (by bucket across all modules)
+    overall_justifications = []
+    for bucket_key in JUSTIFICATIONS.keys():
+        hours = int(sum(per_module_buckets[m].get(bucket_key, 0) for m in MODULE_LABELS.keys()))
+        if hours > 0:
+            overall_justifications.append(
+                {"key": bucket_key, "label": JUSTIFICATIONS[bucket_key], "hours": hours}
+            )
 
     return {
-        "bre_score": bre_hours,
-        "bre_classification":"",
-        "app_score": app_hours,
+        "bre_score": module_totals["bre"],
+        "bre_classification": "",
+        "app_score": module_totals["app"],
         "app_classification": "",
-        "abs_score": abs_hours,
+        "abs_score": module_totals["abs"],
         "abs_classification": "",
-        "exh_score": exh_hours,
+        "exh_score": module_totals["exh"],
         "exh_classification": "",
-        "appointments_score": appointments_hours,
+        "appointments_score": module_totals["appointments"],
         "appointments_classification": "",
-        "kiosk_score": kiosk_hours,
+        "kiosk_score": module_totals["kiosk"],
         "kiosk_classification": "",
-        "additional_hours": additional_hours,
-        "additional_classification": "",
         "total_hours": total_hours,
-        "reasons": final_reasons,
+        "reasons": [],
+
         "module_breakdowns": {
             module_key: {
                 "key": module_key,
@@ -510,15 +568,8 @@ def calculate_classification(features: ProjectFeatures):
             }
             for module_key in MODULE_LABELS.keys()
         },
-        "justifications": [
-            {
-                "key": bucket_key,
-                "label": JUSTIFICATIONS[bucket_key],
-                "hours": int(per_module_buckets["bre"].get(bucket_key, 0) + per_module_buckets["app"].get(bucket_key, 0)),
-            }
-            for bucket_key in JUSTIFICATIONS.keys()
-            if (per_module_buckets["bre"].get(bucket_key, 0) + per_module_buckets["app"].get(bucket_key, 0)) > 0
-        ],
+
+        "justifications": overall_justifications,
     }
 
 FEATURE_LABELS: Dict[str, str] = {
@@ -568,13 +619,6 @@ FEATURE_LABELS: Dict[str, str] = {
     "logic_based_badges": "Logic based badges",
     "multi_badge_types": "Multiple types of badges by attendee type",
     "customer_hardware": "Customer using their own hardware",
-
-    # Custom + PM
-    "integrations": "Integrations",
-    "SSO": "SSO",
-    "multiple_POCs": "Multiple POCs / Divisions",
-    "recurring_calls": "Recurring Calls",
-    "more_than_8_events": "More than 8 events in a calendar year",
 }
 
 MODULE_GROUPS: Dict[str, List[str]] = {
@@ -584,8 +628,6 @@ MODULE_GROUPS: Dict[str, List[str]] = {
     "Exhibitor Registration / Booth Selection": ["exh_include", "floor_plan", "year_round", "complex_sponsors"],
     "Abstract / Speaker Management": ["abs_include", "complex_workflows", "multiple_review_rounds", "multiple_proposal_calls"],
     "Appointment Management": ["appointments_include", "multi_scheduling", "first_time_system", "matchmaking"],
-    "Custom / Development": ["integrations", "SSO"],
-    "Project Management": ["multiple_POCs", "recurring_calls", "more_than_8_events"],
 }
 
 def _smtp_send_pdf(to_email: str, subject: str, body_text: str, pdf_bytes: bytes, filename: str) -> None:
@@ -667,6 +709,7 @@ def _build_print_html(customer_name: str, selected_by_module: Dict[str, List[str
             .hours {{ margin-top: 10px; font-size: 12pt; font-weight: 800; }}
             h4 {{ margin: 14px 0 6px 0; font-size: 10pt; }}
             ul {{ margin: 0; padding-left: 18px; }}
+            .disclaimer {{ margin-top: 14px; padding-top: 10px; border-top: 1px solid #e5e7eb; font-size: 9.5pt; color: #374151; line-height: 1.35; }}
         </style>
         </head>
         <body>
@@ -688,11 +731,11 @@ def _build_print_html(customer_name: str, selected_by_module: Dict[str, List[str
             <div class="row">Exhibits — {calc.get('exh_score',0)} hrs</div>
             <div class="row">Appointments — {calc.get('appointments_score',0)} hrs</div>
             <div class="row">Kiosk / Badges — {calc.get('kiosk_score',0)} hrs</div>
-            <div class="row">Custom / PM — {calc.get('additional_hours',0)} hrs</div>
 
             {scope_lines}
 
             <div class="hours">Total PSC Hours: {calc.get('total_hours',0)}</div>
+            <div class="disclaimer">{DISCLAIMER_TEXT}</div>
             </aside>
         </div>
         </body>
@@ -768,7 +811,10 @@ async def email_endpoint(req: EmailRequest):
         )
 
     subject = f"PSC Hours Calculator - {customer}"
-    body = f"Attached are the PSC Hours Calculator results for {customer}."
+    body = (
+        f"Attached are the PSC Hours Calculator results for {customer}.\n\n"
+        f"{DISCLAIMER_TEXT}\n"
+    )
 
     try:
         _smtp_send_pdf(parsed_email, subject, body, pdf_bytes, f"PSC_Hours_{customer}.pdf")
@@ -776,7 +822,6 @@ async def email_endpoint(req: EmailRequest):
         raise HTTPException(status_code=500, detail=f"Email send failed: {e}")
 
     return {"ok": True}
-
 
 @app.post("/pdf")
 async def pdf_endpoint(req: PdfRequest):

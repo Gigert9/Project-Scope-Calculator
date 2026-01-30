@@ -49,13 +49,6 @@ function buildProjectData() {
         logic_based_badges: isChecked('logic_based_badges'),
         multi_badge_types: isChecked('multi_badge_types'),
         customer_hardware: isChecked('customer_hardware'),
-
-        integrations: isChecked('integrations'),
-        SSO: isChecked('SSO'),
-
-        multiple_POCs: isChecked('multiple_POCs'),
-        recurring_calls: isChecked('recurring_calls'),
-        more_than_8_events: isChecked('more_than_8_events')
     };
 }
 
@@ -170,7 +163,6 @@ async function updateClassification() {
         updateModuleUI('exh', 'Exhibits', result.exh_score);
         updateModuleUI('appointments', 'Appointments', result.appointments_score);
         updateModuleUI('kiosk', 'Kiosk / Badges', result.kiosk_score);
-        updateModuleUI('additional', 'Custom / PM', result.additional_hours);
 
         document.getElementById('total-hours').innerText = `Total PSC Hours: ${result.total_hours}`;
     } catch (error) {
@@ -286,7 +278,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('reasons-container').style.display = 'none';
         document.getElementById('reasons-list').innerHTML = '';
 
-        const sections = ['bre', 'app', 'abs', 'exh', 'appointments', 'kiosk', 'additional'];
+        const sections = ['bre', 'app', 'abs', 'exh', 'appointments', 'kiosk'];
         sections.forEach(s => {
             document.getElementById(`${s}-classification`).innerText = s === 'bre' ? "Waiting for selection..." : "";
             document.getElementById(`${s}-score`).innerText = "";

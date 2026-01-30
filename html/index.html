@@ -26,7 +26,7 @@
                 Customer: <span id="customer-name-print"></span>
             </div>
         </div>
-
+        
         <div id="calculator-form">
             <div class="main-layout">
                 <div class="form-sections">
@@ -177,29 +177,6 @@
                             </label>
                         </span>
                     </section>
-
-                    <section class="module">
-                        <h2>Custom / Development</h2>
-                        <label class="feature">
-                            <input type="checkbox" id="integrations">Integrations
-                        </label>
-                        <label class="feature">
-                            <input type="checkbox" id="SSO">SSO
-                        </label>
-                    </section>
-
-                    <section class="module">
-                        <h2>Project Management</h2>
-                        <label class="feature">
-                            <input type="checkbox" id="multiple_POCs">Multiple POCs / Divisions
-                        </label>
-                        <label class="feature">
-                            <input type="checkbox" id="recurring_calls">Recurring Calls
-                        </label>
-                        <label class="feature">
-                            <input type="checkbox" id="more_than_8_events">More than 8 events in a calendar year
-                        </label>
-                    </section>
                 </div>
                 <aside class="sidebar">
                     <div class="result-card">
@@ -216,8 +193,6 @@
                         <small><span id="appointments-score"></span></small>
                         <div class="classification" id="kiosk-classification"></div>
                         <small><span id="kiosk-score"></span></small>
-                        <div class="classification" id="additional-classification"></div>
-                        <small><span id="additional-score"></span></small>
                         <div id="reasons-container" style="display: none; margin-top: 1rem; border-top: 1px solid var(--border); padding-top: 1rem;">
                             <h4 style="margin: 0 0 0.5rem 0; font-size: 0.9rem; color: var(--primary);">Scope Breakdown:</h4>
                             <ul id="reasons-list" style="margin: 0; padding-left: 1.2rem; font-size: 0.85rem; color: #475569;">
@@ -236,6 +211,13 @@
                         <div id="email-status" class="status-line" aria-live="polite"></div>
                     </div>
                 </aside>
+            </div>
+        </div>
+        <div class="print-only" id="print-footer" style="display: none;">
+            <div class="print-disclaimer" id="print-disclaimer">
+                Disclaimer: Additional hours (not included) will be required for any new dev work, custom work,
+                integrations/SSO, multiple POCs/Divisions, and for multi event customers or those with committed weekly calls, as well as customers
+                with more than 8 events a year.
             </div>
         </div>
     </div>

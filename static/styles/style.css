@@ -226,9 +226,43 @@ input[type="checkbox"] {
 
     .print-only {
         display: block !important;
+    }
+
+    /* Fixed print header + footer (disclaimer).
+       HTML should include #print-header and #print-footer blocks with class="print-only". */
+    #print-header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        background: white;
         border-bottom: 2px solid #e5e7eb;
         padding-bottom: 10px;
-        margin-bottom: 16px;
+        margin-bottom: 0;
+        z-index: 1000;
+    }
+
+    #print-footer {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: white;
+        border-top: 1px solid #e5e7eb;
+        padding-top: 10px;
+        z-index: 1000;
+    }
+
+    #print-disclaimer {
+        font-size: 9.5pt;
+        color: #374151;
+        line-height: 1.35;
+    }
+
+    /* Make room so content doesn't print under fixed header/footer */
+    body {
+        padding-top: 120px !important;
+        padding-bottom: 90px !important;
     }
 
     .feature {
