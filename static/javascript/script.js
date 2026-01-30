@@ -82,6 +82,80 @@ function setEmailStatus(text) {
     if (el) el.textContent = text || '';
 }
 
+async function openServerPdf() {
+    if (!requireCustomerName()) return;
+
+    const customerName = (getValue('customer-name') || '').trim();
+    const payload = {
+        customer_name: customerName,
+        features: buildProjectData()
+    };
+
+    setEmailStatus('Preparing PDF…');
+
+    // Open a window synchronously to avoid popup blockers.
+    const pdfWindow = window.open('', '_blank');
+    if (pdfWindow) {
+        try {
+            pdfWindow.document.title = 'Preparing PDF…';
+            pdfWindow.document.body.innerHTML = '<p style="font-family:Segoe UI,Arial,sans-serif; padding:16px;">Preparing PDF…</p>';
+        } catch {
+            // ignore
+        }
+    }
+
+    let objectUrl = '';
+    try {
+        const response = await fetch('/pdf', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+        });
+
+        if (!response.ok) {
+            let detail = '';
+            try {
+                detail = await response.text();
+            } catch {
+                detail = '';
+            }
+            throw new Error(detail || `PDF failed (${response.status})`);
+        }
+
+        const blob = await response.blob();
+        objectUrl = URL.createObjectURL(blob);
+
+        if (pdfWindow) {
+            pdfWindow.location = objectUrl;
+        } else {
+            const a = document.createElement('a');
+            a.href = objectUrl;
+            a.target = '_blank';
+            a.download = `PSC_Hours_${customerName || 'Results'}.pdf`;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+        }
+
+        setEmailStatus('');
+    } catch (err) {
+        console.error(err);
+        if (pdfWindow) {
+            try { pdfWindow.close(); } catch { /* ignore */ }
+        }
+        const msg = String(err && (err.message || err) ? (err.message || err) : 'PDF failed');
+        if (msg.includes('NetworkError') || msg.includes('Failed to fetch') || msg.includes('Load failed')) {
+            setEmailStatus('PDF error: Could not reach the server. Confirm the app is running and you are using http://127.0.0.1:8010/ (not a static file or Live Server).');
+        } else {
+            setEmailStatus(`PDF error: ${msg}`);
+        }
+    } finally {
+        if (objectUrl) {
+            setTimeout(() => URL.revokeObjectURL(objectUrl), 60000);
+        }
+    }
+}
+
 async function updateClassification() {
     const projectData = buildProjectData();
 
@@ -261,11 +335,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const printBtn = document.getElementById('print-btn');
     if (printBtn) {
-        printBtn.addEventListener('click', () => {
-            if (!requireCustomerName()) return;
-            syncPrintHeader();
-            window.print();
-        });
+        printBtn.addEventListener('click', openServerPdf);
     }
 
     const emailBtn = document.getElementById('email-btn');

@@ -108,8 +108,8 @@ def health():
     return {"ok": True}
 
 DISCLAIMER_TEXT = (
-    "Disclaimer: Additional hours (not included) will be required for any new dev work, custom work,"
-    "integrations/SSO, multiple POCs/Divisions, and for multi event customers or those with committed weekly calls, as well as customers"
+    "Disclaimer: Additional hours (not included) will be required for any new dev work, custom work, "
+    "integrations/SSO, multiple POCs/Divisions, and for multi-event customers or those with committed weekly calls, as well as customers "
     "with more than 8 events a year."
 )
 
