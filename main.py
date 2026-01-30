@@ -12,13 +12,10 @@ from email.utils import parseaddr
 from typing import Dict, List, Any
 import env
 
-# Playwright spawns subprocesses; on Windows, the Selector event loop policy
-# does not implement subprocess APIs and can raise NotImplementedError().
 if sys.platform == "win32":
     try:
         asyncio.set_event_loop_policy(asyncio.WindowsProactorEventLoopPolicy())
     except Exception:
-        # If this fails for any reason, let runtime surface the error.
         pass
 
 SMTP_HOST= env.SMTP_HOST
@@ -504,7 +501,6 @@ def calculate_classification(features: ProjectFeatures):
         for bucket_key, amount in hours_map.items():
             _add_hours(per_module_buckets[module_key], bucket_key, amount)
 
-    # Force modules off if their include toggle is off (extra safety)
     include_by_module = {
         "bre": "bre_include",
         "app": "app_include",
@@ -526,7 +522,7 @@ def calculate_classification(features: ProjectFeatures):
     # Overall total
     total_hours = int(sum(module_totals.values()))
 
-    # Optional: overall scope breakdown (by bucket across all modules)
+    # Overall scope breakdown (by bucket across all modules)
     overall_justifications = []
     for bucket_key in JUSTIFICATIONS.keys():
         hours = int(sum(per_module_buckets[m].get(bucket_key, 0) for m in MODULE_LABELS.keys()))
