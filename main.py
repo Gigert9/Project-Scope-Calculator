@@ -4,7 +4,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, Response
 from pydantic import BaseModel
 import asyncio
-import os
 import smtplib
 import sys
 from email.message import EmailMessage
@@ -30,9 +29,9 @@ app = FastAPI()
 
 origins = [
     '*',
-    'http://127.0.0.1:8010',
-    'http://localhost:8010',
-    'http://34.239.216.53:8010'
+    'http://127.0.0.1:8020',
+    'http://localhost:8020',
+    'http://34.239.216.53:8020'
 ]
 
 app.add_middleware(
