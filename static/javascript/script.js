@@ -106,7 +106,7 @@ async function openServerPdf() {
 
     let objectUrl = '';
     try {
-        const response = await fetch('/pdf', {
+        const response = await fetch('pdf', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload),
@@ -160,7 +160,7 @@ async function updateClassification() {
     const projectData = buildProjectData();
 
     try {
-        const response = await fetch('/calculate', {
+        const response = await fetch('calculate', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(projectData),
@@ -275,7 +275,7 @@ async function emailResults() {
     };
 
     try {
-        const response = await fetch('/email', {
+        const response = await fetch('email', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload),
